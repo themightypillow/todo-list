@@ -1,4 +1,4 @@
-const Project = (name = "untitled") => {
+const Project = (name) => {
   let tasks = {};
 
   const editName = (newName) => name = newName;
