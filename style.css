@@ -36,6 +36,23 @@ nav {
   border-right: 1px solid #e8e8e8;
 }
 
+form {
+  position: fixed;
+  top: 15%;
+  left: 40%;
+  display: flex;
+  flex-direction: column;
+}
+
+form > * {
+  margin-bottom: 10px;
+}
+
+form > div {
+  display: flex;
+  justify-content: space-between;
+}
+
 .icon-label {
   display: flex;
   align-items: center;
@@ -73,4 +90,17 @@ nav {
 #content {
   display: flex;
   height: 93vh;
+}
+
+#add-project {
+  border: none;
+  background: none;
+}
+
+#add-project:hover {
+  cursor: pointer;
+}
+
+#project-form {
+  display: none;
 }
