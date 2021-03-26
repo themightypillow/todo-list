@@ -1,22 +1,14 @@
-html, body {
-  height: 100%;
-}
-
 body {
   font-family: 'Open Sans', sans-serif;
   color: #1f1f1f;
 }
 
 header {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 10px;
   background-color: #00aaff;
   color: white;
   display: flex;
   align-items: center;
-}
-
-header > svg {
-  margin-right: 10px;
 }
 
 h1, h2, h3, h4 {
@@ -43,23 +35,12 @@ button {
   background: none;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"], svg {
   margin-right: 10px;
 }
 
 nav, main {
   padding-top: 10px;
-}
-
-nav {
-  flex-basis: 20%;
-  padding-left: 10px;
-  padding-right: 10px;
-  border-right: 1px solid #e8e8e8;
-}
-
-nav > * {
-  margin-bottom: 5px;
 }
 
 main {
@@ -71,8 +52,22 @@ main > * {
   margin-bottom: 10px;
 }
 
-main > :first-child {
+main > h2 {
   margin-bottom: 20px;
+}
+
+nav {
+  flex-basis: 20%;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-right: 1px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+nav > .add {
+  padding-bottom: 10px;
 }
 
 .task {
@@ -83,34 +78,33 @@ main > :first-child {
   display: flex;
 }
 
-.nav-group > svg {
-  margin-right: 10px;
-}
-
-#main-content {
-  display: flex;
-  height: 100%;
-}
-
-#projects-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-#projects {
-  margin-left: 25%;
-  font-size: 0.9rem;
-}
-
-#projects > * {
-  margin-bottom: 5px;
-}
-
-#add-task {
+.add {
   display: flex;
   align-items: center;
   color: #a5a5a5;
+}
+
+#default-groups {
+  border-bottom: 1px solid #e8e8e8;
+}
+
+#default-groups > * {
+  margin-bottom: 10px;
+}
+
+#content {
+  display: flex;
+  height: 94vh;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+#projects {
+  padding-top: 5px;
+}
+
+#projects > * {
+  margin-bottom: 10px;
+  display: flex;
 }
 
 #add-task > :last-child {
