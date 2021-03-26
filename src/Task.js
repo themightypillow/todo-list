@@ -1,4 +1,5 @@
 const Task = (title, desc, dueDate, prio = false) => {
+  const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
   let isDone = false;
 
   const toggleDone = () => isDone = !isDone;
@@ -6,7 +7,6 @@ const Task = (title, desc, dueDate, prio = false) => {
   const editTitle = (newTitle) => title = newTitle;
   const editDesc = (newDesc) => desc = newDesc;
   const editDue = (newDue) => dueDate = newDue;
-  const id = () => dueDate.getTime();
 
   const toString = () =>  `Title: ${title}` +
                           `\nDescription: ${desc}` +

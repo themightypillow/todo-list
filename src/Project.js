@@ -2,8 +2,8 @@ const Project = (name = "untitled") => {
   let tasks = {};
 
   const editName = (newName) => name = newName;
-  const addTask = (task) => tasks[task.id()] = task;
-  const deleteTask = (task) => delete tasks[task.id()];
+  const addTask = (task) => tasks[task.id] = task;
+  const deleteTask = (task) => delete tasks[task.id];
 
   const print = () => {
     console.log(`Project: ${name}\n`);
