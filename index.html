@@ -2,11 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title></title>
-  <link rel="stylesheet" href="">
+  <title>To Do List</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet"> 
+  <link rel="stylesheet" href="normalize.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
-  <script src="main.js"></script>
+  <header>
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-list-check" width="28" height="28" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M3.5 5.5l1.5 1.5l2.5 -2.5" />
+      <path d="M3.5 11.5l1.5 1.5l2.5 -2.5" />
+      <path d="M3.5 17.5l1.5 1.5l2.5 -2.5" />
+      <line x1="11" y1="6" x2="20" y2="6" />
+      <line x1="11" y1="12" x2="20" y2="12" />
+      <line x1="11" y1="18" x2="20" y2="18" />
+    </svg>
+    <h1>To Do List</h1>
+  </header>
+  <div id="main-content">
+    <nav>
+      <div class="nav-group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00aaff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <rect x="4" y="5" width="16" height="16" rx="2" />
+          <line x1="16" y1="3" x2="16" y2="7" />
+          <line x1="8" y1="3" x2="8" y2="7" />
+          <line x1="4" y1="11" x2="20" y2="11" />
+          <line x1="11" y1="15" x2="12" y2="15" />
+          <line x1="12" y1="15" x2="12" y2="18" />
+        </svg>
+        <div>Today</div>
+      </div>
+      <div class="nav-group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-minus" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00aaff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <rect x="4" y="5" width="16" height="16" rx="2" />
+          <line x1="16" y1="3" x2="16" y2="7" />
+          <line x1="8" y1="3" x2="8" y2="7" />
+          <line x1="4" y1="11" x2="20" y2="11" />
+          <line x1="10" y1="16" x2="14" y2="16" />
+        </svg>
+        <div>Next 7 Days</div>
+      </div>
+      <div class="nav-group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-flag-3" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#dc4c3f" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M5 14h14l-4.5 -4.5l4.5 -4.5h-14v16" />
+        </svg>
+        <div>Important</div>
+      </div>
+      <div id="projects-header">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-down" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#a5a5a5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+        <h3>Projects</h3>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00aaff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </div>
+      </div>
+      <div id="projects">
+        <div>Household Chores</div>
+        <div>Personal Goals</div>
+        <div>Groceries</div>
+      </div>
+    </nav>
+    <main>
+      <h2>Household Chores</h2>
+      <div class="task"><input type="checkbox"><label for="">Wash dishes</label></div>
+      <div class="task"><input type="checkbox"><label for="">Take out trash</label></div>
+      <div class="task"><input type="checkbox"><label for="">Vacuum the floors</label></div>
+      <div class="task"><input type="checkbox"><label for="">Clean the laundry</label></div>
+      <div class="task"><input type="checkbox"><label for="">Wash the windows</label></div>
+      <div id="add-task">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#00aaff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        <div>Add task</div>
+      </div>
+    </main>
+  </div>
+  <!-- <script src="main.js"></script> -->
 </body>
 </html>
