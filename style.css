@@ -4,11 +4,8 @@ body {
 }
 
 header {
-  padding: 0.5rem 10px;
   background-color: #00aaff;
   color: white;
-  display: flex;
-  align-items: center;
 }
 
 h1, h2, h3, h4 {
@@ -22,91 +19,58 @@ h1 {
 
 h2 {
   font-weight: 800;
+  margin: 10px;
 }
 
-h3 {
-  flex-basis: 60%;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-button {
-  border: none;
-  background: none;
-}
-
-input[type="checkbox"], svg {
-  margin-right: 10px;
-}
-
-nav, main {
-  padding-top: 10px;
+h4 {
+  font-weight: normal;
 }
 
 main {
-  flex-basis: 80%;
-  margin: 10px 0 0 20px;
-}
-
-main > * {
-  margin-bottom: 10px;
-}
-
-main > h2 {
-  margin-bottom: 20px;
+  flex-basis: 60%;
+  border-right: 1px solid #e8e8e8;
 }
 
 nav {
   flex-basis: 20%;
-  padding-left: 10px;
-  padding-right: 10px;
   border-right: 1px solid #e8e8e8;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
-nav > .add {
-  padding-bottom: 10px;
+.icon-label {
+  display: flex;
+  align-items: center;
+  padding: 10px;
 }
 
-.task {
-  display: flex;
-}
-
-.nav-group {
-  display: flex;
+.icon-label > :first-child {
+  margin-right: 10px;
 }
 
 .add {
+  color: #c8c8c8;
+}
+
+#task-info {
+  flex-basis: 20%;
+  padding: 0 10px;
+}
+
+#task-info > :first-child {
   display: flex;
-  align-items: center;
-  color: #a5a5a5;
+  justify-content: space-between;
+  margin: 5px;
+}
+
+#task-desc {
+  font-size: 0.9rem;
+  margin-top: 5px;
 }
 
 #default-groups {
   border-bottom: 1px solid #e8e8e8;
 }
 
-#default-groups > * {
-  margin-bottom: 10px;
-}
-
 #content {
   display: flex;
-  height: 94vh;
-  border-bottom: 1px solid #e8e8e8;
-}
-
-#projects {
-  padding-top: 5px;
-}
-
-#projects > * {
-  margin-bottom: 10px;
-  display: flex;
-}
-
-#add-task > :last-child {
-  margin-left: 10px;
+  height: 93vh;
 }
