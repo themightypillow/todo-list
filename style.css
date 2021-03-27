@@ -97,7 +97,7 @@ form > div {
   background: none;
 }
 
-#add-project:hover {
+#add-project:hover, .group:hover {
   cursor: pointer;
 }
 
