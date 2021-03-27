@@ -1,17 +1,19 @@
 const Project = (name) => {
   let tasks = {};
 
-  const editName = (newName) => name = newName;
+  const setName = (newName) => name = newName;
+  const getName = () => name;
   const addTask = (task) => tasks[task.id] = task;
   const deleteTask = (task) => delete tasks[task.id];
 
   const print = () => {
     console.log(`Project: ${name}\n`);
     Object.keys(tasks).forEach(id => console.log(tasks[id].toString()));
-  }
+  };
 
   return {
-    editName,
+    setName,
+    getName,
     addTask,
     deleteTask,
     print

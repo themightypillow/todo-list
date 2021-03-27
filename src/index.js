@@ -1,3 +1,1 @@
-import projectDOM from "./project-dom";
-
-projectDOM();
+import "./UI";
