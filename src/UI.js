@@ -17,6 +17,18 @@ const UI = (() => {
     addTaskText.textContent = "Add Task";
     addTask.appendChild(addTaskText);
     main.appendChild(addTask);
+  };
+
+  const addToSidebar = (name) => {
+    const projects = document.querySelector("#projects");
+    const newProject = document.createElement("div");
+    newProject.classList.add("icon-label", "group");
+    newProject.appendChild(listSVG.cloneNode(true));
+    const h4 = document.createElement("h4");
+    h4.textContent = name;
+    newProject.appendChild(h4);
+    newProject.addEventListener("click", displayProject);
+    projects.appendChild(newProject);
   }
 
   // set up adding new project
@@ -30,7 +42,6 @@ const UI = (() => {
     const nameLabel = document.querySelector("#new-project-name");
     const cancel = document.querySelector("#cancel-project");
     const submit = document.querySelector("#submit-project");
-    const projects = document.querySelector("#projects");
 
     nameLabel.addEventListener("keypress", e => {
       if(e.keyCode === 13) e.preventDefault();
@@ -44,17 +55,9 @@ const UI = (() => {
 
     submit.addEventListener("click", e => {
       e.preventDefault();
-      const newProject = document.createElement("div");
-      newProject.classList.add("icon-label", "group");
-      newProject.appendChild(listSVG.cloneNode(true));
       const projectName = nameLabel.value === "" ? "Untitled" : nameLabel.value;
-      const h4 = document.createElement("h4");
-      h4.textContent = projectName;
-      newProject.appendChild(h4);
-      newProject.addEventListener("click", displayProject);
-      console.log("what");
-      projects.appendChild(newProject);
-      // todo.add(projectName);
+      addToSidebar(projectName)
+      todo.add(projectName);
       form.style.display = "none";
       nameLabel.value = "";
     });
@@ -67,6 +70,12 @@ const UI = (() => {
     groups.forEach(group => {
       group.addEventListener("click", displayProject);
     });
+  })();
+
+  // load any existing projects from storage
+  (function() {
+    todo.load();
+    todo.getNames().forEach(name => addToSidebar(name));
   })();
 
 })();
