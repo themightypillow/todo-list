@@ -53,6 +53,10 @@ form > div {
   justify-content: space-between;
 }
 
+.bold {
+  font-weight: 700;
+}
+
 .icon-label {
   display: flex;
   align-items: center;

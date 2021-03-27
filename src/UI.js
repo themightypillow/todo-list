@@ -3,7 +3,14 @@ import todo from "./todo";
 
 const UI = (() => {
 
+  const boldActiveProject = (active) => {
+    document.querySelectorAll(".group > h4").forEach(
+        label => label.classList.remove("bold"));
+    active.classList.add("bold");
+  };
+
   const displayProject = (e) => {
+    boldActiveProject(e.currentTarget.querySelector("h4"));
     const main = document.querySelector("main");
     while(main.firstChild) main.removeChild(main.firstChild);
     const title = document.createElement("h2");
@@ -17,9 +24,11 @@ const UI = (() => {
     addTaskText.textContent = "Add Task";
     addTask.appendChild(addTaskText);
     main.appendChild(addTask);
+
+    // if(e.currentTarget.id) console.log(todo.getById(e.currentTarget.id).getName());
   };
 
-  const addToSidebar = (name) => {
+  const addToSidebar = (name, id) => {
     const projects = document.querySelector("#projects");
     const newProject = document.createElement("div");
     newProject.classList.add("icon-label", "group");
@@ -28,8 +37,15 @@ const UI = (() => {
     h4.textContent = name;
     newProject.appendChild(h4);
     newProject.addEventListener("click", displayProject);
+    newProject.id = id;
     projects.appendChild(newProject);
   }
+
+  // load any existing projects from storage
+  (function() {
+    todo.load();
+    Object.entries(todo.getProjects()).forEach(pair => addToSidebar(pair[1], pair[0]));
+  })();
 
   // set up adding new project
   (function() {
@@ -70,12 +86,6 @@ const UI = (() => {
     groups.forEach(group => {
       group.addEventListener("click", displayProject);
     });
-  })();
-
-  // load any existing projects from storage
-  (function() {
-    todo.load();
-    todo.getNames().forEach(name => addToSidebar(name));
   })();
 
 })();
