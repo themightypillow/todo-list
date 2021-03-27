@@ -9,12 +9,12 @@ const UI = (() => {
     active.classList.add("bold");
   };
 
-  const displayProject = (e) => {
-    boldActiveProject(e.currentTarget.querySelector("h4"));
+  const displayProject = (node) => {
+    boldActiveProject(node.querySelector("h4"));
     const main = document.querySelector("main");
     while(main.firstChild) main.removeChild(main.firstChild);
     const title = document.createElement("h2");
-    title.textContent = e.currentTarget.textContent;
+    title.textContent = node.textContent;
     main.appendChild(title);
 
     const addTask = document.createElement("div");
@@ -36,15 +36,24 @@ const UI = (() => {
     const h4 = document.createElement("h4");
     h4.textContent = name;
     newProject.appendChild(h4);
-    newProject.addEventListener("click", displayProject);
+    newProject.addEventListener("click", e => displayProject(e.currentTarget));
     newProject.id = id;
     projects.appendChild(newProject);
+    return newProject;
   }
 
   // load any existing projects from storage
   (function() {
     todo.load();
     Object.entries(todo.getProjects()).forEach(pair => addToSidebar(pair[1], pair[0]));
+  })();
+
+  // display project groups on click
+  (function() {
+    const groups = document.querySelectorAll(".group");
+    groups.forEach(group => {
+      group.addEventListener("click", e => displayProject(e.currentTarget));
+    });
   })();
 
   // set up adding new project
@@ -71,20 +80,11 @@ const UI = (() => {
 
     submit.addEventListener("click", e => {
       e.preventDefault();
-      const projectName = nameLabel.value === "" ? "Untitled" : nameLabel.value;
-      addToSidebar(projectName)
-      todo.add(projectName);
       form.style.display = "none";
+      const projectName = nameLabel.value === "" ? "Untitled" : nameLabel.value;
+      todo.add(projectName);
       nameLabel.value = "";
-    });
-
-  })();
-
-  // display existing project groups on click
-  (function() {
-    const groups = document.querySelectorAll(".group");
-    groups.forEach(group => {
-      group.addEventListener("click", displayProject);
+      displayProject(addToSidebar(projectName));
     });
   })();
 
