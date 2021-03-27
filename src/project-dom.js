@@ -1,6 +1,14 @@
 import listSVG from "./svg";
 
-const projectDOM = () => {
+const callback = (e) => {
+  const main = document.querySelector("main");
+  while(main.firstChild) main.removeChild(main.firstChild);
+  const title = document.createElement("h2");
+  title.textContent = e.target.textContent;
+  main.appendChild(title);
+};
+
+const add = () => {
   const nameLabel = document.querySelector("#new-project-name");
   const cancel = document.querySelector("#cancel-project");
   const form = document.querySelector("#project-form");
@@ -23,12 +31,13 @@ const projectDOM = () => {
 
     const newProject = document.createElement("div");
     newProject.classList.add("icon-label");
+    newProject.classList.add("group");
     newProject.appendChild(listSVG.cloneNode(true));
     const h4 = document.createElement("h4");
     h4.textContent = nameLabel.value === "" ? "Untitled" : nameLabel.value;
     newProject.appendChild(h4);
+    newProject.addEventListener("click", callback);
     projects.appendChild(newProject);
-
     form.style.display = "none";
   });
 
@@ -37,4 +46,16 @@ const projectDOM = () => {
   });
 };
 
-export default projectDOM;
+const display = () => {
+  const groups = document.querySelectorAll(".group");
+  groups.forEach(group => {
+    group.addEventListener("click", callback);
+  });
+};
+
+const main = () => {
+  add();
+  display();
+};
+
+export default main;
