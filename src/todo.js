@@ -24,6 +24,7 @@ const todo = (() => {
     const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
     projects[id] = Project(name);
     localStorage.setItem("projects", JSON.stringify(Object.values(getProjects())));
+    return id;
   };
 
   const getProjects = () =>  {

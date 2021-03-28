@@ -3,6 +3,21 @@ import todo from "./todo";
 
 const UI = (() => {
 
+  const displayTask = (title) => {
+    const task = document.createElement("div");
+    task.classList.add("icon-label");
+    const checkbox = document.createElement("input");
+    checkbox.setAttribute("type", "checkbox");
+    const label = document.createElement("label");
+    label.textContent = title;
+    task.appendChild(checkbox);
+    task.appendChild(label);
+
+    const main = document.querySelector("main");
+    const add = document.querySelector("main > .add");
+    main.insertBefore(task, add);
+  }
+
   const boldActiveProject = (active) => {
     document.querySelectorAll(".group > h4").forEach(
         label => label.classList.remove("bold"));
@@ -89,9 +104,8 @@ const UI = (() => {
       e.preventDefault();
       form.style.display = "none";
       const projectName = nameLabel.value === "" ? "Untitled" : nameLabel.value;
-      todo.add(projectName);
       nameLabel.value = "";
-      displayProject(addToSidebar(projectName));
+      displayProject(addToSidebar(projectName, todo.add(projectName)));
     });
   })();
 
@@ -120,6 +134,7 @@ const UI = (() => {
     const add = document.querySelector("#submit-task");
     add.addEventListener("click", e => {
       e.preventDefault();
+      if(title.value) displayTask(title.value);
       clearForm();
     });
   })();
