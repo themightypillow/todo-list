@@ -39,7 +39,8 @@ const UI = (() => {
     addTaskText.textContent = "Add Task";
     addTask.appendChild(addTaskText);
     addTask.addEventListener("click", e => {
-      const form = document.querySelector("#task-form")
+      const form = document.querySelector("#task-form");
+      form.dataset.index = node.dataset.index;
       form.style.display = "block";
     });
     main.appendChild(addTask);
@@ -62,7 +63,7 @@ const UI = (() => {
   // load existing projects from storage and display first
   (function() {
     todo.load();
-    todo.getProjects().forEach((name, index) => addToSidebar(name, index));
+    todo.names().forEach((name, index) => addToSidebar(name, index));
     displayProject(document.querySelector("#projects > div"));
   })();
 
@@ -137,7 +138,19 @@ const UI = (() => {
     const add = document.querySelector("#submit-task");
     add.addEventListener("click", e => {
       e.preventDefault();
-      if(title.value) displayTask(title.value);
+      if(title.value) {
+        const date = new Date(
+          due.value ? new Date(due.value.replaceAll("-", "/")) : new Date()
+        );
+        const project = todo.at(form.dataset.index);
+        project.add(
+          title.value,
+          desc.value,
+          date,
+          prio.checked
+        );
+        displayTask(title.value);
+      }
       clearForm();
     });
   })();

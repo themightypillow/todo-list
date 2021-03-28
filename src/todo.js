@@ -36,13 +36,16 @@ const todo = (() => {
     return index;
   };
 
-  const getProjects = () => projects.map(project => project.getName());
+  const at = (index) => projects[index];
+
+  const names = () => projects.map(project => project.getName());
 
   return {
     store,
     load,
     add,
-    getProjects
+    at,
+    names
   };
 })();
 
