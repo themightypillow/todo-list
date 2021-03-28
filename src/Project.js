@@ -9,16 +9,17 @@ const Project = (name, id) => {
   const store = () => {
     localStorage.setItem(`project-${id}`, JSON.stringify({
       name,
-      tasks: tasks.map(task => task.toObject())
+      tasks: all()
     }));
   };
   const add = (title, desc, due, prio) => {
     const index = tasks.length;
     tasks.push(Task(tasks.length, title, desc, due, prio));
-    store();
     return index;
   };
   const remove = (task) => tasks.splice(task.getId(), 1);
+
+  const all = () => tasks.map(task => task.toObject());
 
   return {
     setName,
@@ -26,6 +27,7 @@ const Project = (name, id) => {
     store,
     add,
     remove,
+    all
   };
 };
 

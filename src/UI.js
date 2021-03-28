@@ -19,7 +19,7 @@ const UI = (() => {
   }
 
   const boldActiveProject = (active) => {
-    document.querySelectorAll(".group > h4").forEach(
+    document.querySelectorAll(".project > h4").forEach(
         label => label.classList.remove("bold"));
     active.classList.add("bold");
   };
@@ -31,6 +31,9 @@ const UI = (() => {
     const title = document.createElement("h2");
     title.textContent = node.textContent;
     main.appendChild(title);
+
+    // display project tasks
+    todo.at(node.dataset.index).all().forEach(task => displayTask(task.title));
 
     const addTask = document.createElement("div");
     addTask.classList.add("icon-label", "add");
@@ -49,7 +52,7 @@ const UI = (() => {
   const addToSidebar = (name, index) => {
     const projects = document.querySelector("#projects");
     const newProject = document.createElement("div");
-    newProject.classList.add("icon-label", "group");
+    newProject.classList.add("icon-label", "project");
     newProject.appendChild(listSVG.cloneNode(true));
     const h4 = document.createElement("h4");
     h4.textContent = name;
@@ -65,14 +68,6 @@ const UI = (() => {
     todo.load();
     todo.names().forEach((name, index) => addToSidebar(name, index));
     displayProject(document.querySelector("#projects > div"));
-  })();
-
-  // display project groups on click
-  (function() {
-    const groups = document.querySelectorAll(".group");
-    groups.forEach(group => {
-      group.addEventListener("click", e => displayProject(e.currentTarget));
-    });
   })();
 
   // disable enter key behavior in text inputs
@@ -107,9 +102,9 @@ const UI = (() => {
       const projectName = nameLabel.value === "" ? "Untitled" : nameLabel.value;
       nameLabel.value = "";
       const index = todo.add(projectName);
-      todo.store();
+      todo.update();
+      todo.store(index);
       displayProject(addToSidebar(projectName, index));
-
     });
   })();
 
@@ -143,12 +138,8 @@ const UI = (() => {
           due.value ? new Date(due.value.replaceAll("-", "/")) : new Date()
         );
         const project = todo.at(form.dataset.index);
-        project.add(
-          title.value,
-          desc.value,
-          date,
-          prio.checked
-        );
+        project.add(title.value, desc.value, date, prio.checked);
+        project.store();
         displayTask(title.value);
       }
       clearForm();

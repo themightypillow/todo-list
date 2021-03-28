@@ -77,7 +77,7 @@ form > div {
   color: #c8c8c8;
 }
 
-.add:hover, .group:hover {
+.add:hover, .project:hover {
   cursor: pointer;
 }
 
