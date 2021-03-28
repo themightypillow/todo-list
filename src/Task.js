@@ -1,27 +1,27 @@
-const Task = (title, desc, dueDate, prio = false) => {
-  const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
+const Task = (id, title, desc, dueDate, prio) => {
   let isDone = false;
 
+  const getId = () => id;
   const toggleDone = () => isDone = !isDone;
   const togglePrio = () => prio = !prio;
   const editTitle = (newTitle) => title = newTitle;
   const editDesc = (newDesc) => desc = newDesc;
   const editDue = (newDue) => dueDate = newDue;
-
-  const toString = () =>  `Title: ${title}` +
-                          `\nDescription: ${desc}` +
-                          `\nDue: ${dueDate.toLocaleDateString()}` +
-                          `\nPriority: ${prio ? "Important" : "Not Important"}` +
-                          `\nCompleted: ${isDone ? "Yes" : "No"}`;
+  const toObject = () => {
+    title,
+    desc,
+    dueDate,
+    prio
+  };
                                 
   return {
+    getId,
     toggleDone,
     togglePrio,
     editTitle,
     editDesc,
     editDue,
-    id,
-    toString
+    toObject
   };
 
 };

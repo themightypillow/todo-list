@@ -1,22 +1,27 @@
-const Project = (name) => {
-  let tasks = {};
+const Project = (name, index) => {
+  const tasks = [];
 
   const setName = (newName) => name = newName;
   const getName = () => name;
-  const addTask = (task) => tasks[task.id] = task;
-  const deleteTask = (task) => delete tasks[task.id];
 
-  const print = () => {
-    console.log(`Project: ${name}\n`);
-    Object.keys(tasks).forEach(id => console.log(tasks[id].toString()));
+  const store = () => {
+    localStorage.setItem(`project-${index}`, JSON.stringify({
+      name,
+      tasks: tasks.map(task => task.toObject())
+    }));
   };
+  const add = (title, desc, due, prio = false) => {
+    tasks.push(Task(tasks.length, title, desc, due, prio));
+    store();
+  };
+  const remove = (task) => tasks.splice(task.getId(), 1);
 
   return {
     setName,
     getName,
-    addTask,
-    deleteTask,
-    print
+    store,
+    add,
+    remove,
   };
 };
 

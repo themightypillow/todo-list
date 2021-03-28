@@ -1,46 +1,48 @@
 import Project from "./Project";
 
 const todo = (() => {
-  const projects = {};
+  const projects = [];
+
+  const store = () => {
+    localStorage.setItem("project-total", projects.length);
+  };
 
   const load = () => {
     if(localStorage.length === 0) {
       add("My Tasks");
+      store();
     }
-    else if(localStorage.getItem("projects")) {
-      try {
-        Object.values(JSON.parse(localStorage.getItem("projects"))).forEach(name => {
-          add(name);
-        });
+    else if(localStorage.getItem("project-total")) {
+      const total = Number(localStorage.getItem("project-total"));
+      if(Number.isInteger(total)) {
+        for(let i = 0; i < total; i++) {
+          const data = JSON.parse(localStorage.getItem(`project-${i}`));
+          add(data.name);
+        }
       }
-      catch(e) {
+      else {
         localStorage.clear();
         add("My Tasks");
+        store();
       }
     }
   };
 
   const add = (name) => {
-    const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
-    projects[id] = Project(name);
-    localStorage.setItem("projects", JSON.stringify(Object.values(getProjects())));
-    return id;
+    const index = projects.length;
+    const project = Project(name, index);
+    project.store();
+    projects.push(project);
+    return index;
   };
 
-  const getProjects = () =>  {
-    return Object.keys(projects).reduce((obj, id) => {
-      obj[id] = projects[id].getName();
-      return obj;
-    }, {});
-  };
-
-  const getById = (id) => projects[id];
+  const getProjects = () => projects.map(project => project.getName());
 
   return {
+    store,
     load,
     add,
-    getProjects,
-    getById
+    getProjects
   };
 })();
 

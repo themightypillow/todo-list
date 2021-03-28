@@ -45,7 +45,7 @@ const UI = (() => {
     main.appendChild(addTask);
   };
 
-  const addToSidebar = (name, id) => {
+  const addToSidebar = (name, index) => {
     const projects = document.querySelector("#projects");
     const newProject = document.createElement("div");
     newProject.classList.add("icon-label", "group");
@@ -54,7 +54,7 @@ const UI = (() => {
     h4.textContent = name;
     newProject.appendChild(h4);
     newProject.addEventListener("click", e => displayProject(e.currentTarget));
-    newProject.id = id;
+    newProject.dataset.index = index;
     projects.appendChild(newProject);
     return newProject;
   }
@@ -62,7 +62,7 @@ const UI = (() => {
   // load existing projects from storage and display first
   (function() {
     todo.load();
-    Object.entries(todo.getProjects()).forEach(pair => addToSidebar(pair[1], pair[0]));
+    todo.getProjects().forEach((name, index) => addToSidebar(name, index));
     displayProject(document.querySelector("#projects > div"));
   })();
 
@@ -105,7 +105,10 @@ const UI = (() => {
       form.style.display = "none";
       const projectName = nameLabel.value === "" ? "Untitled" : nameLabel.value;
       nameLabel.value = "";
-      displayProject(addToSidebar(projectName, todo.add(projectName)));
+      const index = todo.add(projectName);
+      todo.store();
+      displayProject(addToSidebar(projectName, index));
+
     });
   })();
 
