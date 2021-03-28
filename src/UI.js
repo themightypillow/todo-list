@@ -1,4 +1,4 @@
-import {listSVG, addSVG} from "./svg";
+import * as svg from "./svg";
 import todo from "./todo";
 
 const UI = (() => {
@@ -37,7 +37,7 @@ const UI = (() => {
 
     const addTask = document.createElement("div");
     addTask.classList.add("icon-label", "add");
-    addTask.appendChild(addSVG);
+    addTask.appendChild(svg.add);
     const addTaskText = document.createElement("div");
     addTaskText.textContent = "Add Task";
     addTask.appendChild(addTaskText);
@@ -53,7 +53,7 @@ const UI = (() => {
     const projects = document.querySelector("#projects");
     const newProject = document.createElement("div");
     newProject.classList.add("icon-label", "project");
-    newProject.appendChild(listSVG.cloneNode(true));
+    newProject.appendChild(svg.list.cloneNode(true));
     const h4 = document.createElement("h4");
     h4.textContent = name;
     newProject.appendChild(h4);
@@ -65,6 +65,10 @@ const UI = (() => {
 
   // load existing projects from storage and display first
   (function() {
+    document.querySelector("#task-info").appendChild(svg.circle);
+    document.querySelector("#task-info").appendChild(svg.trash);
+    document.querySelector("#task-info").appendChild(svg.calendar);
+    document.querySelector("#task-info").appendChild(svg.flag);
     todo.load();
     todo.names().forEach((name, index) => addToSidebar(name, index));
     displayProject(document.querySelector("#projects > div"));
