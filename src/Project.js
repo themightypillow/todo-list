@@ -13,13 +13,11 @@ const Project = (name, id) => {
     }));
   };
   const add = (title, desc, due, prio) => {
-    const index = tasks.length;
-    tasks.push(Task(tasks.length, title, desc, due, prio));
-    return index;
+    return tasks.push(Task(title, desc, due, prio)) - 1;
   };
   const remove = (task) => tasks.splice(task.getId(), 1);
 
-  const all = () => tasks.map(task => task.toObject());
+  const all = () => tasks.map(task => task.info());
 
   return {
     setName,

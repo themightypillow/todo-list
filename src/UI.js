@@ -3,17 +3,58 @@ import todo from "./todo";
 
 const UI = (() => {
 
-  const displayTask = (title) => {
+  const clearChildren = (node) => {
+    while(node.firstChild) node.removeChild(node.firstChild);
+  }
+
+  const displayTask = (data) => {
+    const info = document.querySelector("#task-info");
+    clearChildren(info);
+
+    const icons = document.createElement("div");
+    icons.appendChild(svg.circle);
+    icons.appendChild(svg.trash);
+    info.appendChild(icons);
+
+    const title = document.createElement("h3");
+    title.textContent = data.title;
+    info.appendChild(title);
+
+    const desc = document.createElement("div");
+    desc.textContent = data.desc;
+    info.appendChild(desc);
+
+    const due = document.createElement("div");
+    due.classList.add("icon-label");
+    due.appendChild(svg.calendar);
+    const date = document.createElement("div");
+    date.textContent = data.due.toDateString().replace(" ", ", ");
+    due.appendChild(date);
+    info.appendChild(due);
+
+    const important = document.createElement("div");
+    important.classList.add("icon-label");
+    important.appendChild(svg.flag);
+    const text = document.createElement("div");
+    text.textContent = "Important";
+    important.appendChild(text);
+    info.appendChild(important);
+  };
+
+  const listTask = (data) => {
     const task = document.createElement("div");
     task.classList.add("icon-label");
     const checkbox = document.createElement("input");
     checkbox.setAttribute("type", "checkbox");
     const label = document.createElement("label");
-    label.textContent = title;
+    label.textContent = data.title;
     task.appendChild(checkbox);
     task.appendChild(label);
 
+    // display task on right when clicked
     const main = document.querySelector("main");
+    label.addEventListener("click", e => displayTask(data));
+
     const add = document.querySelector("main > .add");
     main.insertBefore(task, add);
   }
@@ -27,13 +68,18 @@ const UI = (() => {
   const displayProject = (node) => {
     boldActiveProject(node.querySelector("h4"));
     const main = document.querySelector("main");
-    while(main.firstChild) main.removeChild(main.firstChild);
+    clearChildren(main);
+    clearChildren(document.querySelector("#task-info"));
+
     const title = document.createElement("h2");
     title.textContent = node.textContent;
     main.appendChild(title);
+    main.dataset.index = node.dataset.index;
 
-    // display project tasks
-    todo.at(node.dataset.index).all().forEach(task => displayTask(task.title));
+    todo.at(node.dataset.index).all().forEach((task, index) => listTask({
+      index,
+      ...task
+    }));
 
     const addTask = document.createElement("div");
     addTask.classList.add("icon-label", "add");
@@ -65,10 +111,6 @@ const UI = (() => {
 
   // load existing projects from storage and display first
   (function() {
-    document.querySelector("#task-info").appendChild(svg.circle);
-    document.querySelector("#task-info").appendChild(svg.trash);
-    document.querySelector("#task-info").appendChild(svg.calendar);
-    document.querySelector("#task-info").appendChild(svg.flag);
     todo.load();
     todo.names().forEach((name, index) => addToSidebar(name, index));
     displayProject(document.querySelector("#projects > div"));
@@ -142,9 +184,15 @@ const UI = (() => {
           due.value ? new Date(due.value.replaceAll("-", "/")) : new Date()
         );
         const project = todo.at(form.dataset.index);
-        project.add(title.value, desc.value, date, prio.checked);
+        const index = project.add(title.value, desc.value, date, prio.checked);
         project.store();
-        displayTask(title.value);
+        listTask({
+          index, 
+          title: title.value, 
+          desc: desc.value, 
+          due: date, 
+          prio: prio.checked
+        });
       }
       clearForm();
     });

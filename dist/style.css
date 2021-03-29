@@ -102,7 +102,7 @@ form > div {
   margin: 5px;
 }
 
-#task-desc {
+#task-info > h3 + div {
   font-size: 0.9rem;
   margin-top: 5px;
 }

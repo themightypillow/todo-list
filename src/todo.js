@@ -29,7 +29,7 @@ const todo = (() => {
           const data = JSON.parse(localStorage.getItem(`project-${i}`));
           const index = add(data.name);
           data.tasks.forEach(task => {
-            projects[index].add(task.title, task.desc, new Date(task.dueDate), task.prio);
+            projects[index].add(task.title, task.desc, new Date(task.due), task.prio);
           });
         }
       }

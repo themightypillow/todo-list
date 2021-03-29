@@ -1,29 +1,27 @@
-const Task = (id, title, desc, dueDate, prio) => {
+const Task = (title, desc, due, prio) => {
   let isDone = false;
 
-  const getId = () => id;
   const toggleDone = () => isDone = !isDone;
   const togglePrio = () => prio = !prio;
   const setTitle = (newTitle) => title = newTitle;
   const setDesc = (newDesc) => desc = newDesc;
-  const setDue = (newDue) => dueDate = newDue;
-  const toObject = () => {
+  const setDue = (newDue) => due = newDue;
+  const info = () => {
     return {
       title,
       desc,
-      dueDate,
+      due,
       prio
     }
   };
                                 
   return {
-    getId,
     toggleDone,
     togglePrio,
     setTitle,
     setDesc,
     setDue,
-    toObject
+    info
   };
 
 };
