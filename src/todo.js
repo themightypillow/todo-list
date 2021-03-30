@@ -4,11 +4,11 @@ const todo = (() => {
   let projects = [];
 
   const init = () => {
-    store(add("My Tasks"));
-    update();
+    at(add("My Tasks")).store();
+    store();
   };
 
-  const update = () => {
+  const store = () => {
     localStorage.setItem("project-total", projects.length);
   };
 
@@ -47,17 +47,14 @@ const todo = (() => {
     return index;
   };
 
-  const store = (index) => projects[index].store();
-
   const at = (index) => projects[index];
 
   const names = () => projects.map(project => project.getName());
 
   return {
-    update,
+    store,
     load,
     add,
-    store,
     at,
     names
   };

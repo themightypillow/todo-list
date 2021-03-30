@@ -119,6 +119,16 @@ const UI = (() => {
 
     submit.addEventListener("click", e => {
       e.preventDefault();
+      const sidebar = node.querySelector("h4");
+      sidebar.textContent = name.value;
+      if(sidebar.classList.contains("bold")) {
+        document.querySelector("#project-header > h2").textContent = name.value;
+      }
+
+      const project = todo.at(node.dataset.index);
+      project.setName(name.value);
+      project.store();
+
       container.style.display = "none";
       name.value = "";
       form.removeChild(header);
@@ -149,7 +159,7 @@ const UI = (() => {
     container.appendChild(edit);
 
     edit.addEventListener("click", e => {
-      editProject(e.currentTarget);
+      editProject(newProject);
     });
 
     container.addEventListener("mouseover", e => {
@@ -211,8 +221,9 @@ const UI = (() => {
       const projectName = nameLabel.value === "" ? "Untitled" : nameLabel.value;
       nameLabel.value = "";
       const index = todo.add(projectName);
-      todo.update();
-      todo.store(index);
+      todo.store();
+      todo.at(index).store();
+      // todo.store(index);
       displayProject(addToSidebar(projectName, index));
     });
 
