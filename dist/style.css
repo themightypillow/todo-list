@@ -45,10 +45,6 @@ form {
   border: 1px solid #e8e8e8;
 }
 
-form > h3 {
-  text-align: center;
-}
-
 form > * {
   margin-bottom: 10px;
 }

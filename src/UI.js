@@ -89,6 +89,46 @@ const UI = (() => {
     main.appendChild(addTask);
   };
 
+  const editProject = (node) => {
+    const form = document.querySelector("#project-form > form");
+    const header = document.createElement("div");
+    const h3 = document.createElement("h3");
+    const name = document.querySelector("#new-project-name");
+
+    h3.textContent = "Edit Project";
+    header.appendChild(h3);
+    header.appendChild(svg.trash);
+    form.insertBefore(header, name);
+
+    const cancel = document.createElement("button");
+    cancel.textContent = "Cancel";
+    const submit = document.createElement("button");
+    submit.textContent = "Ok";
+    const buttons = document.createElement("div");
+    buttons.appendChild(cancel);
+    buttons.appendChild(submit);
+    form.appendChild(buttons);
+
+    cancel.addEventListener("click", e => {
+      e.preventDefault();
+      container.style.display = "none";
+      name.value = "";
+      form.removeChild(header);
+      form.removeChild(buttons);
+    });
+
+    submit.addEventListener("click", e => {
+      e.preventDefault();
+      container.style.display = "none";
+      name.value = "";
+      form.removeChild(header);
+      form.removeChild(buttons);
+    });
+
+    const container = document.querySelector("#project-form");
+    container.style.display = "block";
+  }
+
   const addToSidebar = (name, index) => {
     const projects = document.querySelector("#projects");
     const newProject = document.createElement("div");
@@ -107,6 +147,10 @@ const UI = (() => {
     edit.classList.add("edit");
     edit.style.display = "none";
     container.appendChild(edit);
+
+    edit.addEventListener("click", e => {
+      editProject(e.currentTarget);
+    });
 
     container.addEventListener("mouseover", e => {
       e.currentTarget.querySelector(".edit").style.display = "block";
@@ -137,24 +181,33 @@ const UI = (() => {
 
   // set up adding new project
   (function() {
-    const add = document.querySelector("#add-project");
-    const form = document.querySelector("#project-form");
-    add.addEventListener("click", e => {
-      form.style.display = "block";
-    });
-
+    const form = document.querySelector("#project-form > form");
     const nameLabel = document.querySelector("#new-project-name");
-    const cancel = document.querySelector("#cancel-project");
+    const container = form.parentElement;
+    const header = document.createElement("h3");
+    header.textContent = "New Project";
+
+    const buttons = document.createElement("div");
+    const cancel = document.createElement("button");
+    cancel.textContent = "Cancel";
+    const submit = document.createElement("button");
+    submit.textContent = "Ok";
+    buttons.appendChild(cancel);
+    buttons.appendChild(submit);
+
     cancel.addEventListener("click", e => {
       e.preventDefault();
       nameLabel.value = "";
-      form.style.display = "none";
+      container.style.display = "none";
+      form.removeChild(header);
+      form.removeChild(buttons);
     });
 
-    const submit = document.querySelector("#submit-project");
     submit.addEventListener("click", e => {
       e.preventDefault();
-      form.style.display = "none";
+      container.style.display = "none";
+      form.removeChild(header);
+      form.removeChild(buttons);
       const projectName = nameLabel.value === "" ? "Untitled" : nameLabel.value;
       nameLabel.value = "";
       const index = todo.add(projectName);
@@ -162,6 +215,14 @@ const UI = (() => {
       todo.store(index);
       displayProject(addToSidebar(projectName, index));
     });
+
+    const add = document.querySelector("#add-project");
+    add.addEventListener("click", e => {
+      form.insertBefore(header, nameLabel);
+      form.appendChild(buttons);
+      container.style.display = "block";
+    });
+  
   })();
 
   // set up adding new task
