@@ -1,8 +1,11 @@
 import * as svg from "./svg";
 import todo from "./todo";
-import {clearChildren, buildFormButtons} from "./helpers";
 
 const UI = (() => {
+
+  const clearChildren = (node) => {
+    while(node.firstChild) node.removeChild(node.firstChild);
+  }
 
   const displayTask = (data) => {
     const info = document.querySelector("#task-info");
@@ -44,7 +47,7 @@ const UI = (() => {
 
     const add = document.querySelector("main > .add");
     main.insertBefore(task, add);
-  }
+  };
 
   const boldActiveProject = (active) => {
     document.querySelectorAll(".project > h4").forEach(
@@ -52,32 +55,40 @@ const UI = (() => {
     active.classList.add("bold");
   };
 
-  const editProject = (node) => {
-    const form = document.querySelector("#project-form > form");
-    const header = document.createElement("div");
-    const h3 = document.createElement("h3");
-    const name = document.querySelector("#new-project-name");
-    const sidebar = node.querySelector("h4");
+  const formElements = () => {
+    return {
+      container: document.querySelector("#project-form"),
+      form: document.querySelector("#project-form > form"),
+      name: document.querySelector("#new-project-name"),
+      cancel: document.querySelector("#cancel-project")
+    }
+  };
 
+  const clearForm = () => {
+    const {container, form, name, cancel} = formElements();
+    name.value = "";
+    container.style.display = "none";
+    form.querySelector("h3").textContent = "";
+    cancel.disabled = true;
+    if(document.querySelector("#cancel-project + button")) {
+      form.querySelector("#buttons").removeChild(
+        document.querySelector("#cancel-project + button"));
+    }
+  };
+
+  const editProject = (node) => {
+    const {container, form, name, cancel} = formElements();
+    form.querySelector("h3").textContent = "Edit Project";
+    const ok = document.createElement("button");
+    ok.textContent = "Ok";
+    form.querySelector("#buttons").appendChild(ok);
+    cancel.disabled = false;
+    container.style.display = "block";
+
+    const sidebar = node.querySelector("h4");
     name.value = sidebar.textContent;
 
-    h3.textContent = "Edit Project";
-    header.appendChild(h3);
-    header.appendChild(svg.trash);
-    form.insertBefore(header, name);
-
-    const buttons = buildFormButtons();
-    form.appendChild(buttons);
-
-    buttons.firstChild.addEventListener("click", e => {
-      e.preventDefault();
-      container.style.display = "none";
-      name.value = "";
-      form.removeChild(header);
-      form.removeChild(buttons);
-    });
-
-    buttons.lastChild.addEventListener("click", e => {
+    ok.addEventListener("click", e => {
       e.preventDefault();
       sidebar.textContent = name.value;
       if(sidebar.classList.contains("bold")) {
@@ -88,14 +99,8 @@ const UI = (() => {
       project.setName(name.value);
       project.store();
 
-      container.style.display = "none";
-      name.value = "";
-      form.removeChild(header);
-      form.removeChild(buttons);
+      clearForm();
     });
-
-    const container = document.querySelector("#project-form");
-    container.style.display = "block";
   };
 
   const displayProject = (node) => {
@@ -189,39 +194,30 @@ const UI = (() => {
 
   // set up adding new project
   (function() {
-    const form = document.querySelector("#project-form > form");
-    const nameLabel = document.querySelector("#new-project-name");
-    const container = form.parentElement;
-    const header = document.createElement("h3");
-    header.textContent = "New Project";
+    const {container, form, name, cancel} = formElements();
+    const ok = document.createElement("button");
+    ok.textContent = "Ok";
 
-    const buttons = buildFormButtons();
-
-    buttons.firstChild.addEventListener("click", e => {
+    cancel.addEventListener("click", e => {
       e.preventDefault();
-      nameLabel.value = "";
-      container.style.display = "none";
-      form.removeChild(header);
-      form.removeChild(buttons);
+      clearForm();
     });
 
-    buttons.lastChild.addEventListener("click", e => {
+    ok.addEventListener("click", (e) => {
       e.preventDefault();
-      container.style.display = "none";
-      form.removeChild(header);
-      form.removeChild(buttons);
-      const projectName = nameLabel.value === "" ? "Untitled" : nameLabel.value;
-      nameLabel.value = "";
+      const projectName = name.value === "" ? "Untitled" : name.value;
       const index = todo.add(projectName);
       todo.store();
       todo.at(index).store();
       displayProject(addToSidebar(projectName, index));
+      clearForm();
     });
 
     const add = document.querySelector("#add-project");
     add.addEventListener("click", e => {
-      form.insertBefore(header, nameLabel);
-      form.appendChild(buttons);
+      form.querySelector("h3").textContent = "New Project";
+      cancel.disabled = false;
+      form.querySelector("#buttons").appendChild(ok);
       container.style.display = "block";
     });
   
