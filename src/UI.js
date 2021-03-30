@@ -12,8 +12,8 @@ const UI = (() => {
     clearChildren(info);
 
     const icons = document.createElement("div");
-    icons.appendChild(svg.circle);
-    icons.appendChild(svg.trash);
+    icons.appendChild(svg.circle.cloneNode(true));
+    icons.appendChild(svg.edit.cloneNode(true));
     info.appendChild(icons);
 
     const title = document.createElement("h3");
@@ -31,24 +31,14 @@ const UI = (() => {
     date.textContent = data.due.toDateString().replace(" ", ", ");
     due.appendChild(date);
     info.appendChild(due);
-
-    const important = document.createElement("div");
-    important.classList.add("icon-label");
-    important.appendChild(svg.flag);
-    const text = document.createElement("div");
-    text.textContent = "Important";
-    important.appendChild(text);
-    info.appendChild(important);
   };
 
   const listTask = (data) => {
     const task = document.createElement("div");
     task.classList.add("icon-label");
-    const checkbox = document.createElement("input");
-    checkbox.setAttribute("type", "checkbox");
     const label = document.createElement("label");
     label.textContent = data.title;
-    task.appendChild(checkbox);
+    task.appendChild(svg.circle.cloneNode(true));
     task.appendChild(label);
 
     // display task on right when clicked
@@ -68,13 +58,17 @@ const UI = (() => {
   const displayProject = (node) => {
     boldActiveProject(node.querySelector("h4"));
     const main = document.querySelector("main");
+    main.dataset.index = node.dataset.index;
     clearChildren(main);
     clearChildren(document.querySelector("#task-info"));
 
+    const header = document.createElement("div");
     const title = document.createElement("h2");
     title.textContent = node.textContent;
-    main.appendChild(title);
-    main.dataset.index = node.dataset.index;
+    header.appendChild(title);
+    header.appendChild(svg.edit.cloneNode(true));
+    header.id = "project-header";
+    main.appendChild(header);
 
     todo.at(node.dataset.index).all().forEach((task, index) => listTask({
       index,
@@ -105,7 +99,23 @@ const UI = (() => {
     newProject.appendChild(h4);
     newProject.addEventListener("click", e => displayProject(e.currentTarget));
     newProject.dataset.index = index;
-    projects.appendChild(newProject);
+
+    const container = document.createElement("div");
+    container.classList.add("project-sidebar");
+    container.appendChild(newProject);
+    const edit = svg.edit.cloneNode(true);
+    edit.classList.add("edit");
+    edit.style.display = "none";
+    container.appendChild(edit);
+
+    container.addEventListener("mouseover", e => {
+      e.currentTarget.querySelector(".edit").style.display = "block";
+    });
+    container.addEventListener("mouseout", e => {
+      e.currentTarget.querySelector(".edit").style.display = "none";
+    });
+
+    projects.appendChild(container);
     return newProject;
   }
 
@@ -113,7 +123,7 @@ const UI = (() => {
   (function() {
     todo.load();
     todo.names().forEach((name, index) => addToSidebar(name, index));
-    displayProject(document.querySelector("#projects > div"));
+    displayProject(document.querySelector(".project"));
   })();
 
   // disable enter key behavior in text inputs
