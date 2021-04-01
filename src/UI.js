@@ -5,7 +5,39 @@ const UI = (() => {
 
   const clearChildren = (node) => {
     while(node.firstChild) node.removeChild(node.firstChild);
-  }
+  };
+
+  const tFormElements = () => {
+    return {
+      form: document.querySelector("#task-form"),
+      title: document.querySelector("#new-task-title"),
+      desc: document.querySelector("#new-task-desc"),
+      due: document.querySelector("#new-task-due"),
+      prio: document.querySelector("#new-task-prio"),
+      cancel: document.querySelector("#cancel-task")
+    }
+  };
+
+  const clearTaskForm = (edit) => {
+    if(edit) clearChildren(document.querySelector("#task-info"));
+
+    const {form, title, desc, due, prio, cancel} = tFormElements();
+    form.style.display = "none";
+    title.value = "";
+    desc.value = "";
+    due.value = "";
+    prio.checked = false;
+    cancel.disabled = true;
+    form.querySelector("h3").textContent = "";
+    if(document.querySelector("#cancel-task + button")) {
+      form.querySelector("#task-buttons").removeChild(
+        document.querySelector("#cancel-task + button"));
+    }
+  };
+
+  const editTask = () => {
+    console.log("will edit");
+  };
 
   const displayTask = (data) => {
     const info = document.querySelector("#task-info");
@@ -13,7 +45,13 @@ const UI = (() => {
 
     const icons = document.createElement("div");
     icons.appendChild(svg.circle.cloneNode(true));
-    icons.appendChild(svg.edit.cloneNode(true));
+
+    const edit = svg.edit.cloneNode(true);
+    edit.addEventListener("click", e => {
+      editTask();
+    });
+
+    icons.appendChild(edit);
     info.appendChild(icons);
 
     const title = document.createElement("h3");
@@ -41,12 +79,48 @@ const UI = (() => {
     task.appendChild(svg.circle.cloneNode(true));
     task.appendChild(label);
 
-    // display task on right when clicked
     const main = document.querySelector("main");
     label.addEventListener("click", e => displayTask(data));
 
     const add = document.querySelector("main > .add");
     main.insertBefore(task, add);
+  };
+
+  const addTask = (index) => {
+    const {form, title, desc, due, prio, cancel} = tFormElements();
+    form.querySelector("h3").textContent = "New Task";
+    cancel.disabled = false;
+    const ok = document.createElement("button");
+    ok.textContent = "Ok";
+    form.querySelector("#task-buttons").appendChild(ok);
+
+    cancel.addEventListener("click", e => {
+      e.preventDefault();
+      clearTaskForm(false);
+    });
+
+    ok.addEventListener("click", e => {
+      e.preventDefault();
+      if(title.value) {
+        const date = new Date(
+          due.value ? new Date(due.value.replaceAll("-", "/")) : new Date()
+        );
+        const project = todo.at(index);
+        
+        const id = project.add(title.value, desc.value, date, prio.checked);
+        project.store();
+        listTask({
+          index: id, 
+          title: title.value, 
+          desc: desc.value, 
+          due: date, 
+          prio: prio.checked
+        });
+      }
+      clearTaskForm(false);
+    });
+
+    form.style.display = "block";
   };
 
   const boldActiveProject = (active) => {
@@ -55,7 +129,7 @@ const UI = (() => {
     active.classList.add("bold");
   };
 
-  const formElements = () => {
+  const pFormElements = () => {
     return {
       container: document.querySelector("#project-form"),
       form: document.querySelector("#project-form > form"),
@@ -64,14 +138,14 @@ const UI = (() => {
     }
   };
 
-  const clearForm = () => {
-    const {container, form, name, cancel} = formElements();
+  const clearProjectForm = () => {
+    const {container, form, name, cancel} = pFormElements();
     name.value = "";
     container.style.display = "none";
     form.querySelector("h3").textContent = "";
     cancel.disabled = true;
     if(document.querySelector("#cancel-project + button")) {
-      form.querySelector("#buttons").removeChild(
+      form.querySelector("#project-buttons").removeChild(
         document.querySelector("#cancel-project + button"));
     }
     if(document.querySelector("#project-form-header > svg")) {
@@ -94,20 +168,20 @@ const UI = (() => {
           `.project[data-index="${node.dataset.index}"]`);
       if(next) displayProject(next);
     }
-  }
+  };
 
   const editProject = (node) => {
-    const {container, form, name, cancel} = formElements();
+    const {container, form, name, cancel} = pFormElements();
     form.querySelector("h3").textContent = "Edit Project";
     const ok = document.createElement("button");
     ok.textContent = "Ok";
-    form.querySelector("#buttons").appendChild(ok);
+    form.querySelector("#project-buttons").appendChild(ok);
     cancel.disabled = false;
 
     const trash = svg.trash.cloneNode(true);
     trash.addEventListener("click", e => {
       deleteProject(node);
-      clearForm();
+      clearProjectForm();
     });
     document.querySelector("#project-form-header").appendChild(trash);
     container.style.display = "block";
@@ -126,7 +200,7 @@ const UI = (() => {
       project.setName(name.value);
       project.store();
 
-      clearForm();
+      clearProjectForm();
     });
   };
 
@@ -155,18 +229,14 @@ const UI = (() => {
       ...task
     }));
 
-    const addTask = document.createElement("div");
-    addTask.classList.add("icon-label", "add");
-    addTask.appendChild(svg.add);
-    const addTaskText = document.createElement("div");
-    addTaskText.textContent = "Add Task";
-    addTask.appendChild(addTaskText);
-    addTask.addEventListener("click", e => {
-      const form = document.querySelector("#task-form");
-      form.dataset.index = node.dataset.index;
-      form.style.display = "block";
-    });
-    main.appendChild(addTask);
+    const add = document.createElement("div");
+    add.classList.add("icon-label", "add");
+    add.appendChild(svg.add);
+    const addText = document.createElement("div");
+    addText.textContent = "Add Task";
+    add.appendChild(addText);
+    add.addEventListener("click", e => addTask(node.dataset.index));
+    main.appendChild(add);
   };
 
   const addToSidebar = (name, index) => {
@@ -201,7 +271,7 @@ const UI = (() => {
 
     projects.appendChild(container);
     return newProject;
-  }
+  };
 
   // load existing projects from storage and display first
   (function() {
@@ -221,13 +291,13 @@ const UI = (() => {
 
   // set up adding new project
   (function() {
-    const {container, form, name, cancel} = formElements();
+    const {container, form, name, cancel} = pFormElements();
     const ok = document.createElement("button");
     ok.textContent = "Ok";
 
     cancel.addEventListener("click", e => {
       e.preventDefault();
-      clearForm();
+      clearProjectForm();
     });
 
     ok.addEventListener("click", (e) => {
@@ -237,60 +307,17 @@ const UI = (() => {
       todo.store();
       todo.at(index).store();
       displayProject(addToSidebar(projectName, index));
-      clearForm();
+      clearProjectForm();
     });
 
     const add = document.querySelector("#add-project");
     add.addEventListener("click", e => {
       form.querySelector("h3").textContent = "New Project";
       cancel.disabled = false;
-      form.querySelector("#buttons").appendChild(ok);
+      form.querySelector("#project-buttons").appendChild(ok);
       container.style.display = "block";
     });
   
   })();
 
-  // set up adding new task
-  (function() {
-    const form = document.querySelector("#task-form");
-    const title = document.querySelector("#new-task-title");
-    const desc = document.querySelector("#new-task-desc");
-    const due = document.querySelector("#new-task-due");
-    const prio = document.querySelector("#new-task-prio");
-
-    const clearForm = () => {
-      title.value = "";
-      desc.value = "";
-      due.value = "";
-      prio.checked = false;
-      form.style.display = "none";
-    };
-
-    const cancel = document.querySelector("#cancel-task");
-    cancel.addEventListener("click", e => {
-      e.preventDefault();
-      clearForm();
-    });
-
-    const add = document.querySelector("#submit-task");
-    add.addEventListener("click", e => {
-      e.preventDefault();
-      if(title.value) {
-        const date = new Date(
-          due.value ? new Date(due.value.replaceAll("-", "/")) : new Date()
-        );
-        const project = todo.at(form.dataset.index);
-        const index = project.add(title.value, desc.value, date, prio.checked);
-        project.store();
-        listTask({
-          index, 
-          title: title.value, 
-          desc: desc.value, 
-          due: date, 
-          prio: prio.checked
-        });
-      }
-      clearForm();
-    });
-  })();
 })();
