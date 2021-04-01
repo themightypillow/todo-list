@@ -17,7 +17,7 @@ const Project = (name, id) => {
   const add = (title, desc, due, prio) => {
     return tasks.push(Task(title, desc, due, prio)) - 1;
   };
-  const remove = (task) => tasks.splice(task.getId(), 1);
+  const remove = (index) => tasks.splice(index, 1);
 
   const all = () => tasks.map(task => task.info());
 

@@ -18,8 +18,8 @@ const UI = (() => {
     }
   };
 
-  const clearTaskForm = (edit) => {
-    if(edit) clearChildren(document.querySelector("#task-info"));
+  const clearTaskForm = (isEdit) => {
+    if(isEdit) clearChildren(document.querySelector("#task-info"));
 
     const {form, title, desc, due, prio, cancel} = tFormElements();
     form.style.display = "none";
@@ -33,6 +33,25 @@ const UI = (() => {
       form.querySelector("#task-buttons").removeChild(
         document.querySelector("#cancel-task + button"));
     }
+    // remove edit svg from header
+  };
+
+  const initTaskForm = (isEdit) => {
+    const {form, cancel} = tFormElements();
+    form.querySelector("h3").textContent = isEdit ? "Edit Task" : "New Task";
+    cancel.disabled = false;
+    const ok = document.createElement("button");
+    ok.textContent = "Ok";
+    form.querySelector("#task-buttons").appendChild(ok);
+    if(isEdit) {
+      const trash = svg.trash.cloneNode(true);
+      trash.addEventListener("click", e => {
+        // delete task here
+        clearTaskForm(true);
+      });
+      document.querySelector("#task-form-header").appendChild(trash);
+    }
+    return ok;
   };
 
   const editTask = () => {
@@ -87,17 +106,8 @@ const UI = (() => {
   };
 
   const addTask = (index) => {
-    const {form, title, desc, due, prio, cancel} = tFormElements();
-    form.querySelector("h3").textContent = "New Task";
-    cancel.disabled = false;
-    const ok = document.createElement("button");
-    ok.textContent = "Ok";
-    form.querySelector("#task-buttons").appendChild(ok);
-
-    cancel.addEventListener("click", e => {
-      e.preventDefault();
-      clearTaskForm(false);
-    });
+    const {form, title, desc, due, prio} = tFormElements();
+    const ok = initTaskForm(false);
 
     ok.addEventListener("click", e => {
       e.preventDefault();
@@ -154,6 +164,24 @@ const UI = (() => {
     }
   };
 
+  const initProjectForm = (isEdit, node) => {
+    const {form, cancel} = pFormElements();
+    form.querySelector("h3").textContent = isEdit ? "Edit Project" : "New Project";
+    cancel.disabled = false;
+    const ok = document.createElement("button");
+    ok.textContent = "Ok";
+    form.querySelector("#project-buttons").appendChild(ok);
+    if(isEdit) {
+      const trash = svg.trash.cloneNode(true);
+      trash.addEventListener("click", e => {
+        deleteProject(node);
+        clearProjectForm();
+      });
+      document.querySelector("#project-form-header").appendChild(trash);
+    }
+    return ok;
+  };
+
   const deleteProject = (node) => {
     const main = document.querySelector("main");
 
@@ -172,20 +200,8 @@ const UI = (() => {
 
   const editProject = (node) => {
     const {container, form, name, cancel} = pFormElements();
-    form.querySelector("h3").textContent = "Edit Project";
-    const ok = document.createElement("button");
-    ok.textContent = "Ok";
-    form.querySelector("#project-buttons").appendChild(ok);
-    cancel.disabled = false;
-
-    const trash = svg.trash.cloneNode(true);
-    trash.addEventListener("click", e => {
-      deleteProject(node);
-      clearProjectForm();
-    });
-    document.querySelector("#project-form-header").appendChild(trash);
-    container.style.display = "block";
-
+    const ok = initProjectForm(true, node);
+    
     const sidebar = node.querySelector("h4");
     name.value = sidebar.textContent;
 
@@ -202,6 +218,7 @@ const UI = (() => {
 
       clearProjectForm();
     });
+    container.style.display = "block";
   };
 
   const displayProject = (node) => {
@@ -291,33 +308,35 @@ const UI = (() => {
 
   // set up adding new project
   (function() {
-    const {container, form, name, cancel} = pFormElements();
-    const ok = document.createElement("button");
-    ok.textContent = "Ok";
+    const {container, name, cancel} = pFormElements();
 
     cancel.addEventListener("click", e => {
       e.preventDefault();
       clearProjectForm();
     });
 
-    ok.addEventListener("click", (e) => {
-      e.preventDefault();
-      const projectName = name.value === "" ? "Untitled" : name.value;
-      const index = todo.add(projectName);
-      todo.store();
-      todo.at(index).store();
-      displayProject(addToSidebar(projectName, index));
-      clearProjectForm();
-    });
-
     const add = document.querySelector("#add-project");
     add.addEventListener("click", e => {
-      form.querySelector("h3").textContent = "New Project";
-      cancel.disabled = false;
-      form.querySelector("#project-buttons").appendChild(ok);
+      const ok = initProjectForm(false);
+      ok.addEventListener("click", (e) => {
+        e.preventDefault();
+        const projectName = name.value === "" ? "Untitled" : name.value;
+        const index = todo.add(projectName);
+        todo.store();
+        todo.at(index).store();
+        displayProject(addToSidebar(projectName, index));
+        clearProjectForm();
+      });
       container.style.display = "block";
     });
-  
+  })();
+
+  // set up task cancel button
+  (function() {
+    document.querySelector("#cancel-task").addEventListener("click", e => {
+      e.preventDefault();
+      clearTaskForm();
+    });
   })();
 
 })();
