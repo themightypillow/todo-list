@@ -38,7 +38,7 @@ const UI = (() => {
     }
   };
 
-  const initTaskForm = (isEdit) => {
+  const initTaskForm = (isEdit, projectIndex, index) => {
     const {form, cancel} = tFormElements();
     form.querySelector("h3").textContent = isEdit ? "Edit Task" : "New Task";
     cancel.disabled = false;
@@ -48,7 +48,7 @@ const UI = (() => {
     if(isEdit) {
       const trash = svg.trash.cloneNode(true);
       trash.addEventListener("click", e => {
-        // delete task here
+        deleteTask(projectIndex, index);
         clearTaskForm();
       });
       document.querySelector("#task-form-header").appendChild(trash);
@@ -56,9 +56,19 @@ const UI = (() => {
     return ok;
   };
 
+  const deleteTask = (projectIndex, index) => {
+    clearChildren(document.querySelector("#task-info"));
+    document.querySelector("main").removeChild(
+      document.querySelectorAll("main > .task")[index]
+    );
+    todo.at(projectIndex).remove(index);
+    todo.at(projectIndex).store();
+  };
+
   const editTask = (data) => {
     const {form, title, desc, due, prio} = tFormElements();
-    const ok = initTaskForm(true);
+    const projectIndex = document.querySelector("main").dataset.index;
+    const ok = initTaskForm(true, projectIndex, data.index);
 
     title.value = data.title;
     desc.value = data.desc;
@@ -67,13 +77,12 @@ const UI = (() => {
 
     ok.addEventListener("click", e => {
       e.preventDefault();
-      document.querySelectorAll("main > .icon-label > label")[data.index].textContent 
+      document.querySelectorAll("main > .task > label")[data.index].textContent 
           = title.value;
       document.querySelector("#task-title").textContent = title.value;
       document.querySelector("#task-desc").textContent = desc.value;
 
-      const task = todo.at(document.querySelector("main").dataset.index)
-                       .at(data.index);
+      const task = todo.at(projectIndex).at(data.index);
       task.setTitle(title.value);
       task.setDesc(desc.value);
       const newDue = due.value ? new Date(due.value.replaceAll("-", "/")) : new Date();
@@ -127,7 +136,7 @@ const UI = (() => {
 
   const listTask = (data) => {
     const task = document.createElement("div");
-    task.classList.add("icon-label");
+    task.classList.add("icon-label", "task");
     const label = document.createElement("label");
     label.textContent = data.title;
     task.appendChild(svg.circle.cloneNode(true));
