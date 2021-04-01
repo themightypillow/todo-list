@@ -1,3 +1,4 @@
+import {format} from "date-fns";
 import * as svg from "./svg";
 import todo from "./todo";
 
@@ -10,17 +11,15 @@ const UI = (() => {
   const tFormElements = () => {
     return {
       form: document.querySelector("#task-form"),
-      title: document.querySelector("#new-task-title"),
-      desc: document.querySelector("#new-task-desc"),
-      due: document.querySelector("#new-task-due"),
-      prio: document.querySelector("#new-task-prio"),
-      cancel: document.querySelector("#cancel-task")
+      title: document.querySelector("#task-form-title"),
+      desc: document.querySelector("#task-form-desc"),
+      due: document.querySelector("#task-form-due"),
+      prio: document.querySelector("#task-form-prio"),
+      cancel: document.querySelector("#task-form-cancel")
     }
   };
 
-  const clearTaskForm = (isEdit) => {
-    if(isEdit) clearChildren(document.querySelector("#task-info"));
-
+  const clearTaskForm = () => {
     const {form, title, desc, due, prio, cancel} = tFormElements();
     form.style.display = "none";
     title.value = "";
@@ -29,11 +28,14 @@ const UI = (() => {
     prio.checked = false;
     cancel.disabled = true;
     form.querySelector("h3").textContent = "";
-    if(document.querySelector("#cancel-task + button")) {
-      form.querySelector("#task-buttons").removeChild(
-        document.querySelector("#cancel-task + button"));
+    if(document.querySelector("#task-form-cancel + button")) {
+      form.querySelector("#task-form-buttons").removeChild(
+        document.querySelector("#task-form-cancel + button"));
     }
-    // remove edit svg from header
+    if(document.querySelector("#task-form-header > svg")) {
+      document.querySelector("#task-form-header").removeChild(
+        document.querySelector("#task-form-header > svg"));
+    }
   };
 
   const initTaskForm = (isEdit) => {
@@ -42,20 +44,50 @@ const UI = (() => {
     cancel.disabled = false;
     const ok = document.createElement("button");
     ok.textContent = "Ok";
-    form.querySelector("#task-buttons").appendChild(ok);
+    form.querySelector("#task-form-buttons").appendChild(ok);
     if(isEdit) {
       const trash = svg.trash.cloneNode(true);
       trash.addEventListener("click", e => {
         // delete task here
-        clearTaskForm(true);
+        clearTaskForm();
       });
       document.querySelector("#task-form-header").appendChild(trash);
     }
     return ok;
   };
 
-  const editTask = () => {
-    console.log("will edit");
+  const editTask = (data) => {
+    const {form, title, desc, due, prio} = tFormElements();
+    const ok = initTaskForm(true);
+
+    title.value = data.title;
+    desc.value = data.desc;
+    due.value = format(data.due, 'yyyy-MM-dd');
+    prio.checked = data.prio;
+
+    ok.addEventListener("click", e => {
+      e.preventDefault();
+      document.querySelectorAll("main > .icon-label > label")[data.index].textContent 
+          = title.value;
+      document.querySelector("#task-title").textContent = title.value;
+      document.querySelector("#task-desc").textContent = desc.value;
+
+      const task = todo.at(document.querySelector("main").dataset.index)
+                       .at(data.index);
+      task.setTitle(title.value);
+      task.setDesc(desc.value);
+      const newDue = due.value ? new Date(due.value.replaceAll("-", "/")) : new Date();
+      document.querySelector("#task-due").textContent 
+          = newDue.toDateString().replace(" ", ", ");
+      task.setDue(newDue);  
+      task.setPrio(prio.checked);
+
+      todo.at(document.querySelector("main").dataset.index).store();
+
+      clearTaskForm();
+    });
+
+    form.style.display = "block";
   };
 
   const displayTask = (data) => {
@@ -67,7 +99,7 @@ const UI = (() => {
 
     const edit = svg.edit.cloneNode(true);
     edit.addEventListener("click", e => {
-      editTask();
+      editTask(data);
     });
 
     icons.appendChild(edit);
@@ -75,16 +107,19 @@ const UI = (() => {
 
     const title = document.createElement("h3");
     title.textContent = data.title;
+    title.id = "task-title";
     info.appendChild(title);
 
     const desc = document.createElement("div");
     desc.textContent = data.desc;
+    desc.id = "task-desc";
     info.appendChild(desc);
 
     const due = document.createElement("div");
     due.classList.add("icon-label");
     due.appendChild(svg.calendar);
     const date = document.createElement("div");
+    date.id = "task-due";
     date.textContent = data.due.toDateString().replace(" ", ", ");
     due.appendChild(date);
     info.appendChild(due);
@@ -127,7 +162,7 @@ const UI = (() => {
           prio: prio.checked
         });
       }
-      clearTaskForm(false);
+      clearTaskForm();
     });
 
     form.style.display = "block";
@@ -143,8 +178,8 @@ const UI = (() => {
     return {
       container: document.querySelector("#project-form"),
       form: document.querySelector("#project-form > form"),
-      name: document.querySelector("#new-project-name"),
-      cancel: document.querySelector("#cancel-project")
+      name: document.querySelector("#project-form-name"),
+      cancel: document.querySelector("#project-form-cancel")
     }
   };
 
@@ -154,9 +189,9 @@ const UI = (() => {
     container.style.display = "none";
     form.querySelector("h3").textContent = "";
     cancel.disabled = true;
-    if(document.querySelector("#cancel-project + button")) {
-      form.querySelector("#project-buttons").removeChild(
-        document.querySelector("#cancel-project + button"));
+    if(document.querySelector("#project-form-cancel + button")) {
+      form.querySelector("#project-form-buttons").removeChild(
+        document.querySelector("#project-form-cancel + button"));
     }
     if(document.querySelector("#project-form-header > svg")) {
       document.querySelector("#project-form-header").removeChild(
@@ -170,7 +205,7 @@ const UI = (() => {
     cancel.disabled = false;
     const ok = document.createElement("button");
     ok.textContent = "Ok";
-    form.querySelector("#project-buttons").appendChild(ok);
+    form.querySelector("#project-form-buttons").appendChild(ok);
     if(isEdit) {
       const trash = svg.trash.cloneNode(true);
       trash.addEventListener("click", e => {
@@ -333,7 +368,7 @@ const UI = (() => {
 
   // set up task cancel button
   (function() {
-    document.querySelector("#cancel-task").addEventListener("click", e => {
+    document.querySelector("#task-form-cancel").addEventListener("click", e => {
       e.preventDefault();
       clearTaskForm();
     });
