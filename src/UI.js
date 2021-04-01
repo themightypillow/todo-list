@@ -58,11 +58,9 @@ const UI = (() => {
 
   const deleteTask = (projectIndex, index) => {
     clearChildren(document.querySelector("#task-info"));
-    document.querySelector("main").removeChild(
-      document.querySelectorAll("main > .task")[index]
-    );
     todo.at(projectIndex).remove(index);
     todo.at(projectIndex).store();
+    displayProject(document.querySelector(`.project[data-index="${projectIndex}"]`));
   };
 
   const editTask = (data) => {
@@ -77,21 +75,18 @@ const UI = (() => {
 
     ok.addEventListener("click", e => {
       e.preventDefault();
-      document.querySelectorAll("main > .task > label")[data.index].textContent 
-          = title.value;
-      document.querySelector("#task-title").textContent = title.value;
-      document.querySelector("#task-desc").textContent = desc.value;
 
       const task = todo.at(projectIndex).at(data.index);
       task.setTitle(title.value);
       task.setDesc(desc.value);
-      const newDue = due.value ? new Date(due.value.replaceAll("-", "/")) : new Date();
-      document.querySelector("#task-due").textContent 
-          = newDue.toDateString().replace(" ", ", ");
-      task.setDue(newDue);  
+      task.setDue(due.value ? new Date(due.value.replaceAll("-", "/")) : new Date());  
       task.setPrio(prio.checked);
-
-      todo.at(document.querySelector("main").dataset.index).store();
+      todo.at(projectIndex).store();
+      displayProject(document.querySelector(`.project[data-index="${projectIndex}"]`));
+      displayTask({
+        index: data.index,
+        ...task.info()
+      });
 
       clearTaskForm();
     });
@@ -104,7 +99,9 @@ const UI = (() => {
     clearChildren(info);
 
     const icons = document.createElement("div");
-    icons.appendChild(svg.circle.cloneNode(true));
+    icons.appendChild(
+      data.prio ? svg.important.cloneNode(true) : svg.circle.cloneNode(true)
+    );
 
     const edit = svg.edit.cloneNode(true);
     edit.addEventListener("click", e => {
@@ -116,19 +113,16 @@ const UI = (() => {
 
     const title = document.createElement("h3");
     title.textContent = data.title;
-    title.id = "task-title";
     info.appendChild(title);
 
     const desc = document.createElement("div");
     desc.textContent = data.desc;
-    desc.id = "task-desc";
     info.appendChild(desc);
 
     const due = document.createElement("div");
     due.classList.add("icon-label");
     due.appendChild(svg.calendar);
     const date = document.createElement("div");
-    date.id = "task-due";
     date.textContent = data.due.toDateString().replace(" ", ", ");
     due.appendChild(date);
     info.appendChild(due);
@@ -139,7 +133,9 @@ const UI = (() => {
     task.classList.add("icon-label", "task");
     const label = document.createElement("label");
     label.textContent = data.title;
-    task.appendChild(svg.circle.cloneNode(true));
+    task.appendChild(
+      data.prio ? svg.important.cloneNode(true) : svg.circle.cloneNode(true)
+    );
     task.appendChild(label);
 
     const main = document.querySelector("main");
