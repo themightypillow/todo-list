@@ -74,7 +74,27 @@ const UI = (() => {
       form.querySelector("#buttons").removeChild(
         document.querySelector("#cancel-project + button"));
     }
+    if(document.querySelector("#project-form-header > svg")) {
+      document.querySelector("#project-form-header").removeChild(
+        document.querySelector("#project-form-header > svg"));
+    }
   };
+
+  const deleteProject = (node) => {
+    const main = document.querySelector("main");
+
+    document.querySelector("#projects").removeChild(node.parentElement);
+    todo.remove(node.dataset.index);
+    document.querySelectorAll(".project").forEach((sidebar, index) => {
+      sidebar.dataset.index = index;
+    });
+    if(main.dataset.index === node.dataset.index) {
+      clearChildren(main);
+      const next = document.querySelector(
+          `.project[data-index="${node.dataset.index}"]`);
+      if(next) displayProject(next);
+    }
+  }
 
   const editProject = (node) => {
     const {container, form, name, cancel} = formElements();
@@ -83,6 +103,13 @@ const UI = (() => {
     ok.textContent = "Ok";
     form.querySelector("#buttons").appendChild(ok);
     cancel.disabled = false;
+
+    const trash = svg.trash.cloneNode(true);
+    trash.addEventListener("click", e => {
+      deleteProject(node);
+      clearForm();
+    });
+    document.querySelector("#project-form-header").appendChild(trash);
     container.style.display = "block";
 
     const sidebar = node.querySelector("h4");

@@ -47,6 +47,16 @@ const todo = (() => {
     return index;
   };
 
+  const remove = (index) => {
+    localStorage.removeItem(`project-${projects.length - 1}`);
+    projects.splice(index, 1);
+    store();
+    projects.forEach((project, index) => {
+      project.setId(index);
+      project.store();
+    });
+  }
+
   const at = (index) => projects[index];
 
   const names = () => projects.map(project => project.getName());
@@ -55,6 +65,7 @@ const todo = (() => {
     store,
     load,
     add,
+    remove,
     at,
     names
   };

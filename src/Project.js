@@ -6,6 +6,8 @@ const Project = (name, id) => {
   const setName = (newName) => name = newName;
   const getName = () => name;
 
+  const setId = (newId) => id = newId;
+
   const store = () => {
     localStorage.setItem(`project-${id}`, JSON.stringify({
       name,
@@ -22,6 +24,7 @@ const Project = (name, id) => {
   return {
     setName,
     getName,
+    setId,
     store,
     add,
     remove,
