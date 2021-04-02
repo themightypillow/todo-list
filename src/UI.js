@@ -8,6 +8,10 @@ const UI = (() => {
     while(node.firstChild) node.removeChild(node.firstChild);
   };
 
+  const getSidebar = (index) => {
+    return document.querySelector(`.project[data-index="${index}"]`);
+  };
+
   const tFormElements = () => {
     return {
       form: document.querySelector("#task-form"),
@@ -61,12 +65,12 @@ const UI = (() => {
     delete document.querySelector("#task-info").dataset.index;
     todo.at(projectIndex).remove(index);
     todo.at(projectIndex).store();
-    displayProject(document.querySelector(`.project[data-index="${projectIndex}"]`));
+    initMainDisplay(true, projectIndex, todo.at(projectIndex).getName());
   };
 
   const editTask = (data) => {
     const {form, title, desc, due, prio} = tFormElements();
-    const projectIndex = document.querySelector("main").dataset.index;
+    const projectIndex = document.querySelector("main").dataset.type;
     const ok = initTaskForm(true, projectIndex, data.index);
 
     title.value = data.title;
@@ -83,7 +87,7 @@ const UI = (() => {
       task.setDue(due.value ? new Date(due.value.replaceAll("-", "/")) : new Date());  
       task.setPrio(prio.checked);
       todo.at(projectIndex).store();
-      displayProject(document.querySelector(`.project[data-index="${projectIndex}"]`));
+      initMainDisplay(true, projectIndex, todo.at(projectIndex).getName());
       displayTask({
         index: data.index,
         ...task.info()
@@ -96,11 +100,11 @@ const UI = (() => {
   };
 
   const toggleTask = (index) => {
-    const projectIndex = document.querySelector("main").dataset.index;
+    const projectIndex = document.querySelector("main").dataset.type;
     todo.at(projectIndex).at(index).toggleDone();
     todo.at(projectIndex).store();
     const currentIndex = Number(document.querySelector("#task-info").dataset.index);
-    displayProject(document.querySelector(`.project[data-index="${projectIndex}"]`));
+    initMainDisplay(true, projectIndex, todo.at(projectIndex).getName());
     if(currentIndex === index) { 
       displayTask({
         index,
@@ -202,10 +206,21 @@ const UI = (() => {
     form.style.display = "block";
   };
 
-  const boldActiveProject = (active) => {
+  const boldActiveGroup = (isProject, groupType) => {
+    document.querySelectorAll("#default-groups h4").forEach(
+      label => label.classList.remove("bold")
+    );
     document.querySelectorAll(".project > h4").forEach(
-        label => label.classList.remove("bold"));
-    active.classList.add("bold");
+      label => label.classList.remove("bold")
+    );
+    if(isProject) {
+      document.querySelector(
+        `.project[data-index="${groupType}"] > h4`
+      ).classList.add("bold");
+    }
+    else {
+      document.querySelector(`#${groupType} > h4`).classList.add("bold");
+    }
   };
 
   const pFormElements = () => {
@@ -233,7 +248,7 @@ const UI = (() => {
     }
   };
 
-  const initProjectForm = (isEdit, node) => {
+  const initProjectForm = (isEdit, index) => {
     const {form, cancel} = pFormElements();
     form.querySelector("h3").textContent = isEdit ? "Edit Project" : "New Project";
     cancel.disabled = false;
@@ -243,7 +258,7 @@ const UI = (() => {
     if(isEdit) {
       const trash = svg.trash.cloneNode(true);
       trash.addEventListener("click", e => {
-        deleteProject(node);
+        deleteProject(index);
         clearProjectForm();
       });
       document.querySelector("#project-form-header").appendChild(trash);
@@ -251,37 +266,36 @@ const UI = (() => {
     return ok;
   };
 
-  const deleteProject = (node) => {
-    const main = document.querySelector("main");
-
-    document.querySelector("#projects").removeChild(node.parentElement);
-    todo.remove(node.dataset.index);
-    document.querySelectorAll(".project").forEach((sidebar, index) => {
-      sidebar.dataset.index = index;
+  const deleteProject = (index) => {
+    const toDelete = getSidebar(index).parentElement;
+    document.querySelector("#projects").removeChild(toDelete);
+    todo.remove(index);
+    document.querySelectorAll(".project").forEach((sidebar, i) => {
+      sidebar.dataset.index = i;
     });
-    if(main.dataset.index === node.dataset.index) {
+
+    const main = document.querySelector("main");
+    if(main.dataset.type == index) {
       clearChildren(main);
-      const next = document.querySelector(
-          `.project[data-index="${node.dataset.index}"]`);
-      if(next) displayProject(next);
+      if(todo.at(index)) initMainDisplay(true, index, todo.at(index).getName());
     }
   };
 
-  const editProject = (node) => {
-    const {container, form, name, cancel} = pFormElements();
-    const ok = initProjectForm(true, node);
+  const editProject = (index) => {
+    const {container, name} = pFormElements();
+    const ok = initProjectForm(true, index);
     
-    const sidebar = node.querySelector("h4");
+    const sidebar = getSidebar(index).querySelector("h4");
     name.value = sidebar.textContent;
 
     ok.addEventListener("click", e => {
       e.preventDefault();
       sidebar.textContent = name.value;
       if(sidebar.classList.contains("bold")) {
-        document.querySelector("#project-header > h2").textContent = name.value;
+        document.querySelector("main h2").textContent = name.value;
       }
 
-      const project = todo.at(node.dataset.index);
+      const project = todo.at(index);
       project.setName(name.value);
       project.store();
 
@@ -290,40 +304,48 @@ const UI = (() => {
     container.style.display = "block";
   };
 
-  const displayProject = (node) => {
-    boldActiveProject(node.querySelector("h4"));
-    const main = document.querySelector("main");
-    main.dataset.index = node.dataset.index;
-    clearChildren(main);
-    clearChildren(document.querySelector("#task-info"));
-    delete document.querySelector("#task-info").dataset.index;
-
-    const header = document.createElement("div");
-    const title = document.createElement("h2");
-    title.textContent = node.textContent;
-    header.appendChild(title);
-    const edit = svg.edit.cloneNode(true);
-    edit.addEventListener("click", e => {
-      const index = document.querySelector("main").dataset.index;
-      editProject(document.querySelector(`.project[data-index="${index}"]`));
-    });
-    header.appendChild(edit);
-    header.id = "project-header";
-    main.appendChild(header);
-
-    todo.at(node.dataset.index).all().forEach((task, index) => listTask({
-      index,
+  const displayProject = (index) => {
+    todo.at(index).all().forEach((task, id) => listTask({
+      index: id,
       ...task
     }));
-
     const add = document.createElement("div");
     add.classList.add("icon-label", "add");
     add.appendChild(svg.add);
     const addText = document.createElement("div");
     addText.textContent = "Add Task";
     add.appendChild(addText);
-    add.addEventListener("click", e => addTask(node.dataset.index));
-    main.appendChild(add);
+    add.addEventListener("click", e => addTask(index));
+    document.querySelector("main").appendChild(add);
+  };
+
+  const initMainDisplay = (isProject, groupType, heading) => {
+    boldActiveGroup(isProject, groupType);
+    const main = document.querySelector("main");
+    main.dataset.type = groupType;
+    clearChildren(main);
+    clearChildren(document.querySelector("#task-info"));
+    delete document.querySelector("#task-info").dataset.index;
+
+    const header = document.createElement("div");
+    header.classList.add("main-header");
+    const title = document.createElement("h2");
+    title.textContent = heading;
+    header.appendChild(title);
+
+    if(isProject) {
+      const edit = svg.edit.cloneNode(true);
+      edit.addEventListener("click", e => {
+        editProject(groupType);
+      });
+      header.appendChild(edit);
+      main.appendChild(header);
+      displayProject(groupType);
+    }
+    else {
+      // list all tasks for that group
+    }
+    
   };
 
   const addToSidebar = (name, index) => {
@@ -334,7 +356,7 @@ const UI = (() => {
     const h4 = document.createElement("h4");
     h4.textContent = name;
     newProject.appendChild(h4);
-    newProject.addEventListener("click", e => displayProject(e.currentTarget));
+    newProject.addEventListener("click", e => initMainDisplay(true, index, name));
     newProject.dataset.index = index;
 
     const container = document.createElement("div");
@@ -346,7 +368,7 @@ const UI = (() => {
     container.appendChild(edit);
 
     edit.addEventListener("click", e => {
-      editProject(newProject);
+      editProject(index);
     });
 
     container.addEventListener("mouseover", e => {
@@ -357,14 +379,13 @@ const UI = (() => {
     });
 
     projects.appendChild(container);
-    return newProject;
   };
 
   // load existing projects from storage and display first
   (function() {
     todo.load();
     todo.names().forEach((name, index) => addToSidebar(name, index));
-    displayProject(document.querySelector(".project"));
+    // display the first project here in the list if it exists
   })();
 
   // disable enter key behavior in text inputs
@@ -394,7 +415,8 @@ const UI = (() => {
         const index = todo.add(projectName);
         todo.store();
         todo.at(index).store();
-        displayProject(addToSidebar(projectName, index));
+        addToSidebar(projectName, index);
+        initMainDisplay(true, index, projectName);
         clearProjectForm();
       });
       container.style.display = "block";
@@ -406,6 +428,13 @@ const UI = (() => {
     document.querySelector("#task-form-cancel").addEventListener("click", e => {
       e.preventDefault();
       clearTaskForm();
+    });
+  })();
+
+  // display tasks due today when selected
+  (function() {
+    document.querySelector("#today").addEventListener("click", e => {
+
     });
   })();
 
