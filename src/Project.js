@@ -1,4 +1,5 @@
 import Task from "./Task";
+import {isToday} from "date-fns";
 
 const Project = (name, id) => {
   const tasks = [];
@@ -26,6 +27,19 @@ const Project = (name, id) => {
 
   const all = () => tasks.map(task => task.info());
 
+  const today = () => {
+    return tasks.reduce((arr, task, index) => {
+      if(isToday(task.info().due)) {
+        arr.push({
+          projectIndex: id,
+          index: index,
+          ...task.info()
+        });
+      }
+      return arr;
+    }, []);
+  }
+
   return {
     setName,
     getName,
@@ -34,7 +48,8 @@ const Project = (name, id) => {
     at,
     add,
     remove,
-    all
+    all,
+    today
   };
 };
 

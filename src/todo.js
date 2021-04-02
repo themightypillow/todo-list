@@ -63,13 +63,22 @@ const todo = (() => {
 
   const names = () => projects.map(project => project.getName());
 
+  const today = () => {
+    // return all tasks due today (and past due?)
+    return projects.reduce((arr, project) => {
+      arr.push(...project.today());
+      return arr;
+    }, []);
+  };
+
   return {
     store,
     load,
     add,
     remove,
     at,
-    names
+    names,
+    today
   };
 })();
 

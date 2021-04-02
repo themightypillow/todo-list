@@ -12,6 +12,18 @@ const UI = (() => {
     return document.querySelector(`.project[data-index="${index}"]`);
   };
 
+  const isGroup = () => {
+    return Number.isNaN(Number(document.querySelector("main").dataset.type));
+  };
+
+  const refreshGroup = () => {
+    initMainDisplay(
+      false, 
+      document.querySelector("main").dataset.type, 
+      document.querySelector(".main-header > h2").textContent
+    );
+  };
+
   const tFormElements = () => {
     return {
       form: document.querySelector("#task-form"),
@@ -63,14 +75,19 @@ const UI = (() => {
   const deleteTask = (projectIndex, index) => {
     clearChildren(document.querySelector("#task-info"));
     delete document.querySelector("#task-info").dataset.index;
+    delete document.querySelector("#task-info").dataset.projectIndex;
     todo.at(projectIndex).remove(index);
     todo.at(projectIndex).store();
-    initMainDisplay(true, projectIndex, todo.at(projectIndex).getName());
+    if(isGroup()) refreshGroup();
+    else initMainDisplay(true, projectIndex, todo.at(projectIndex).getName());
   };
 
   const editTask = (data) => {
     const {form, title, desc, due, prio} = tFormElements();
-    const projectIndex = document.querySelector("main").dataset.type;
+    const projectIndex = (() => {
+      if(isGroup()) return data.projectIndex;
+      return document.querySelector("main").dataset.type;
+    })();
     const ok = initTaskForm(true, projectIndex, data.index);
 
     title.value = data.title;
@@ -87,46 +104,65 @@ const UI = (() => {
       task.setDue(due.value ? new Date(due.value.replaceAll("-", "/")) : new Date());  
       task.setPrio(prio.checked);
       todo.at(projectIndex).store();
-      initMainDisplay(true, projectIndex, todo.at(projectIndex).getName());
-      displayTask({
-        index: data.index,
-        ...task.info()
-      });
 
+      if(isGroup()) {
+        refreshGroup();
+        displayTask({
+          index: data.index,
+          projectIndex,
+          ...task.info()
+        });
+      }
+      else {
+        initMainDisplay(true, projectIndex, todo.at(projectIndex).getName());
+        displayTask({
+          index: data.index,
+          ...task.info()
+        });
+      }
       clearTaskForm();
     });
 
     form.style.display = "block";
   };
 
-  const toggleTask = (index) => {
-    const projectIndex = document.querySelector("main").dataset.type;
+  const toggleTask = (index, projectIndex = document.querySelector("main").dataset.type) => {
     todo.at(projectIndex).at(index).toggleDone();
     todo.at(projectIndex).store();
     const currentIndex = Number(document.querySelector("#task-info").dataset.index);
-    initMainDisplay(true, projectIndex, todo.at(projectIndex).getName());
-    if(currentIndex === index) { 
-      displayTask({
-        index,
-        ...todo.at(projectIndex).at(index).info()
-      });
+    if(isGroup()) {
+      const currentProjectIndex = Number(
+        document.querySelector("#task-info").dataset.projectIndex
+      );
+      refreshGroup();
+      if(Number.isInteger(currentIndex) && Number.isInteger(currentProjectIndex)) {
+        displayTask({
+          index: currentIndex,
+          projectIndex: currentProjectIndex,
+          ...todo.at(currentProjectIndex).at(currentIndex).info()
+        });
+      }
     }
-    else if(currentIndex) {
-      displayTask({
-        index: currentIndex,
-        ...todo.at(projectIndex).at(currentIndex).info()
-      });
-    }
+    else {
+      initMainDisplay(true, projectIndex, todo.at(projectIndex).getName());
+      if(Number.isInteger(currentIndex)) {
+        displayTask({
+          index: currentIndex,
+          ...todo.at(projectIndex).at(currentIndex).info()
+        });
+      }
+    } 
   };
 
   const displayTask = (data) => {
     const info = document.querySelector("#task-info");
     clearChildren(info);
     info.dataset.index = data.index;
+    if(isGroup()) info.dataset.projectIndex = data.projectIndex;
 
     const status = svg.circle(data.done, data.prio);
     status.addEventListener("click", e => {
-      toggleTask(data.index);
+      toggleTask(data.index, data.projectIndex);
     });
 
     const edit = svg.edit.cloneNode(true);
@@ -162,7 +198,7 @@ const UI = (() => {
 
     const status = svg.circle(data.done, data.prio);
     status.addEventListener("click", () => {
-      toggleTask(data.index);
+      toggleTask(data.index, data.projectIndex);
     });
     task.appendChild(status);
 
@@ -214,9 +250,7 @@ const UI = (() => {
       label => label.classList.remove("bold")
     );
     if(isProject) {
-      document.querySelector(
-        `.project[data-index="${groupType}"] > h4`
-      ).classList.add("bold");
+      getSidebar(groupType).querySelector("h4").classList.add("bold");
     }
     else {
       document.querySelector(`#${groupType} > h4`).classList.add("bold");
@@ -304,19 +338,28 @@ const UI = (() => {
     container.style.display = "block";
   };
 
-  const displayProject = (index) => {
+  const displayProject = (index, header) => {
+    const edit = svg.edit.cloneNode(true);
+    edit.addEventListener("click", e => {
+      editProject(index);
+    });
+    header.appendChild(edit);
     todo.at(index).all().forEach((task, id) => listTask({
       index: id,
       ...task
     }));
-    const add = document.createElement("div");
-    add.classList.add("icon-label", "add");
-    add.appendChild(svg.add);
-    const addText = document.createElement("div");
-    addText.textContent = "Add Task";
-    add.appendChild(addText);
-    add.addEventListener("click", e => addTask(index));
-    document.querySelector("main").appendChild(add);
+  };
+
+  const displayGroup = (group) => {
+    switch(group) {
+      case "today":
+        todo.today().forEach(listTask);
+        break;
+      case "week":
+        break;
+      default:
+        // important
+    }
   };
 
   const initMainDisplay = (isProject, groupType, heading) => {
@@ -326,26 +369,28 @@ const UI = (() => {
     clearChildren(main);
     clearChildren(document.querySelector("#task-info"));
     delete document.querySelector("#task-info").dataset.index;
+    delete document.querySelector("#task-info").dataset.projectIndex;
 
     const header = document.createElement("div");
     header.classList.add("main-header");
     const title = document.createElement("h2");
     title.textContent = heading;
     header.appendChild(title);
+    main.appendChild(header);
+
+    if(isProject) displayProject(groupType, header);
+    else displayGroup(groupType);
 
     if(isProject) {
-      const edit = svg.edit.cloneNode(true);
-      edit.addEventListener("click", e => {
-        editProject(groupType);
-      });
-      header.appendChild(edit);
-      main.appendChild(header);
-      displayProject(groupType);
+      const add = document.createElement("div");
+      add.classList.add("icon-label", "add");
+      add.appendChild(svg.add);
+      const addText = document.createElement("div");
+      addText.textContent = "Add Task";
+      add.appendChild(addText);
+      add.addEventListener("click", e => addTask(groupType));
+      document.querySelector("main").appendChild(add);
     }
-    else {
-      // list all tasks for that group
-    }
-    
   };
 
   const addToSidebar = (name, index) => {
@@ -385,7 +430,7 @@ const UI = (() => {
   (function() {
     todo.load();
     todo.names().forEach((name, index) => addToSidebar(name, index));
-    // display the first project here in the list if it exists
+    if(todo.at(0)) initMainDisplay(true, 0, todo.at(0).getName());
   })();
 
   // disable enter key behavior in text inputs
@@ -434,7 +479,7 @@ const UI = (() => {
   // display tasks due today when selected
   (function() {
     document.querySelector("#today").addEventListener("click", e => {
-
+      initMainDisplay(false, "today", "Today");
     });
   })();
 
