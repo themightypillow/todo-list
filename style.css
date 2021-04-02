@@ -98,6 +98,13 @@ form > div {
   color: #c8c8c8;
 }
 
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px;
+}
+
 #task-info {
   flex-basis: 20%;
   padding: 0 10px;
@@ -127,11 +134,4 @@ form > div {
 #add-project {
   border: none;
   background: none;
-}
-
-#project-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 10px;
 }
