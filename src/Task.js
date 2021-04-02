@@ -1,7 +1,6 @@
-const Task = (title, desc, due, prio) => {
-  let isDone = false;
+const Task = (title, desc, due, prio, done) => {
 
-  const toggleDone = () => isDone = !isDone;
+  const toggleDone = () => done = !done;
   const setTitle = (newTitle) => title = newTitle;
   const setDesc = (newDesc) => desc = newDesc;
   const setDue = (newDue) => due = newDue;
@@ -11,7 +10,8 @@ const Task = (title, desc, due, prio) => {
       title,
       desc,
       due,
-      prio
+      prio,
+      done
     }
   };
                                 

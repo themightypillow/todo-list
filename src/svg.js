@@ -46,32 +46,27 @@ export const list = (() => {
   svg.appendChild(makeLine({x1: "5", y1: "12", x2: "5", y2: "12.01" }));
   svg.appendChild(makeLine({x1: "5", y1: "18", x2: "5", y2: "18.01" }));
   return svg;
-})(); 
+})();
+
+export const circle = (isDone, hasPrio) => {
+  const svg = main.cloneNode(true);
+  svg.setAttributeNS(null, "stroke", "#c8c8c8");
+  svg.appendChild(makeCircle({cx: "12", cy: "12", r: "9"}));
+
+  if(isDone) {
+    svg.appendChild(makePath("M9 12l2 2l4 -4"));
+  }
+  else if(hasPrio) {
+    svg.setAttributeNS(null, "stroke", "#dc4c3f");
+  }
+  return svg;
+};
 
 export const add = (() => {
   const svg = main.cloneNode(true);
   svg.setAttributeNS(null, "stroke", "#00aaff");
   svg.appendChild(makeLine({x1: "12", y1: "5", x2: "12", y2: "19"}));
   svg.appendChild(makeLine({x1: "5", y1: "12", x2: "19", y2: "12"}));
-  return svg;
-})();
-
-export const circle = (() => {
-  const svg = main.cloneNode(true);
-  svg.setAttributeNS(null, "stroke", "#c8c8c8");
-  svg.appendChild(makeCircle({cx: "12", cy: "12", r: "9"}));
-  return svg;
-})();
-
-export const important = (() => {
-  const svg = circle.cloneNode(true);
-  svg.setAttributeNS(null, "stroke", "#dc4c3f");
-  return svg;
-})();
-
-export const done = (() => {
-  const svg = circle.cloneNode(true);
-  svg.appendChild(makePath("M9 12l2 2l4 -4"));
   return svg;
 })();
 

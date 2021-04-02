@@ -18,7 +18,7 @@ const todo = (() => {
     }
     else if(localStorage.getItem("project-total")) {
       const total = Number(localStorage.getItem("project-total"));
-      if(Number.isInteger(total)) {
+      if(Number.isInteger(total) && total > 0) {
         for(let i = 0; i < total; i++) {
           if(!localStorage.getItem(`project-${i}`)) {
             localStorage.clear();
@@ -29,7 +29,9 @@ const todo = (() => {
           const data = JSON.parse(localStorage.getItem(`project-${i}`));
           const index = add(data.name);
           data.tasks.forEach(task => {
-            projects[index].add(task.title, task.desc, new Date(task.due), task.prio);
+            projects[index].add(
+              task.title, task.desc, new Date(task.due), task.prio, task.done
+            );
           });
         }
       }

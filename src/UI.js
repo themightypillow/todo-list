@@ -58,6 +58,7 @@ const UI = (() => {
 
   const deleteTask = (projectIndex, index) => {
     clearChildren(document.querySelector("#task-info"));
+    delete document.querySelector("#task-info").dataset.index;
     todo.at(projectIndex).remove(index);
     todo.at(projectIndex).store();
     displayProject(document.querySelector(`.project[data-index="${projectIndex}"]`));
@@ -94,20 +95,43 @@ const UI = (() => {
     form.style.display = "block";
   };
 
+  const toggleTask = (index) => {
+    const projectIndex = document.querySelector("main").dataset.index;
+    todo.at(projectIndex).at(index).toggleDone();
+    todo.at(projectIndex).store();
+    const currentIndex = Number(document.querySelector("#task-info").dataset.index);
+    displayProject(document.querySelector(`.project[data-index="${projectIndex}"]`));
+    if(currentIndex === index) { 
+      displayTask({
+        index,
+        ...todo.at(projectIndex).at(index).info()
+      });
+    }
+    else if(currentIndex) {
+      displayTask({
+        index: currentIndex,
+        ...todo.at(projectIndex).at(currentIndex).info()
+      });
+    }
+  };
+
   const displayTask = (data) => {
     const info = document.querySelector("#task-info");
     clearChildren(info);
+    info.dataset.index = data.index;
 
-    const icons = document.createElement("div");
-    icons.appendChild(
-      data.prio ? svg.important.cloneNode(true) : svg.circle.cloneNode(true)
-    );
+    const status = svg.circle(data.done, data.prio);
+    status.addEventListener("click", e => {
+      toggleTask(data.index);
+    });
 
     const edit = svg.edit.cloneNode(true);
     edit.addEventListener("click", e => {
       editTask(data);
     });
 
+    const icons = document.createElement("div");
+    icons.appendChild(status);
     icons.appendChild(edit);
     info.appendChild(icons);
 
@@ -131,11 +155,16 @@ const UI = (() => {
   const listTask = (data) => {
     const task = document.createElement("div");
     task.classList.add("icon-label", "task");
+
+    const status = svg.circle(data.done, data.prio);
+    status.addEventListener("click", () => {
+      toggleTask(data.index);
+    });
+    task.appendChild(status);
+
     const label = document.createElement("label");
     label.textContent = data.title;
-    task.appendChild(
-      data.prio ? svg.important.cloneNode(true) : svg.circle.cloneNode(true)
-    );
+    if(data.done) label.classList.add("done");
     task.appendChild(label);
 
     const main = document.querySelector("main");
@@ -157,7 +186,7 @@ const UI = (() => {
         );
         const project = todo.at(index);
         
-        const id = project.add(title.value, desc.value, date, prio.checked);
+        const id = project.add(title.value, desc.value, date, prio.checked, false);
         project.store();
         listTask({
           index: id, 
@@ -267,6 +296,7 @@ const UI = (() => {
     main.dataset.index = node.dataset.index;
     clearChildren(main);
     clearChildren(document.querySelector("#task-info"));
+    delete document.querySelector("#task-info").dataset.index;
 
     const header = document.createElement("div");
     const title = document.createElement("h2");
