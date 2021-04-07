@@ -195,6 +195,16 @@ const UI = (() => {
     date.textContent = data.due.toDateString().replace(" ", ", ");
     due.appendChild(date);
     info.appendChild(due);
+
+    if(data.projectIndex) {
+      const project = document.createElement("div");
+      project.classList.add("icon-label");
+      project.appendChild(svg.list.cloneNode(true));
+      const name = document.createElement("div");
+      name.textContent = todo.at(data.projectIndex).getName();
+      project.appendChild(name);
+      info.appendChild(project);
+    }
   };
 
   const listTask = (data) => {
