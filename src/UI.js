@@ -425,7 +425,7 @@ const UI = (() => {
     const h4 = document.createElement("h4");
     h4.textContent = name;
     newProject.appendChild(h4);
-    newProject.addEventListener("click", e => initMainDisplay(true, index, name));
+    newProject.addEventListener("click", e => initMainDisplay(true, index, todo.at(index).getName()));
     newProject.dataset.index = index;
 
     const container = document.createElement("div");
