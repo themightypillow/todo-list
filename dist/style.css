@@ -58,6 +58,10 @@ svg {
   flex-shrink: 0;
 }
 
+input {
+  border: 1px solid #cdc7c2;
+  border-radius: 0.25rem;
+}
 
 .bold {
   font-weight: 700;
@@ -109,6 +113,18 @@ svg {
   margin: 10px;
 }
 
+.error {
+  border-color: #dc4c3f;
+}
+
+.task-form-container {
+  display: flex;
+}
+
+.column {
+  flex-direction: column;
+}
+
 #task-info {
   flex-basis: 20%;
   padding: 0 10px;
@@ -138,4 +154,9 @@ svg {
 #add-project {
   border: none;
   background: none;
+}
+
+#title-error {
+  color: #dc4c3f;
+  font-size: 0.8rem;
 }

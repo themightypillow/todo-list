@@ -52,6 +52,11 @@ const UI = (() => {
       document.querySelector("#task-form-header").removeChild(
         document.querySelector("#task-form-header > svg"));
     }
+    title.classList.remove("error");
+    if(document.querySelector("#title-error")) {
+      document.querySelector(".task-form-container").removeChild(
+        document.querySelector("#title-error"));
+    }
   };
 
   const initTaskForm = (isEdit, projectIndex, index) => {
@@ -220,7 +225,8 @@ const UI = (() => {
 
     ok.addEventListener("click", e => {
       e.preventDefault();
-      if(title.value) {
+      const trimTitle = title.value.trim();
+      if(trimTitle) {
         const date = new Date(
           due.value ? new Date(due.value.replaceAll("-", "/")) : new Date()
         );
@@ -235,8 +241,15 @@ const UI = (() => {
           due: date, 
           prio: prio.checked
         });
+        clearTaskForm();
       }
-      clearTaskForm();
+      else {
+        const error = document.createElement("div");
+        error.textContent = "Title is required";
+        error.id = "title-error";
+        document.querySelector(".task-form-container").appendChild(error);
+        title.classList.add("error");
+      }
     });
 
     form.style.display = "block";
@@ -457,7 +470,7 @@ const UI = (() => {
       const ok = initProjectForm(false);
       ok.addEventListener("click", (e) => {
         e.preventDefault();
-        const projectName = name.value === "" ? "Untitled" : name.value;
+        const projectName = name.value.trim() === "" ? "Untitled" : name.value.trim();
         const index = todo.add(projectName);
         todo.store();
         todo.at(index).store();
