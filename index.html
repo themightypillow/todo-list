@@ -83,13 +83,17 @@
     <form action="">
       <div id="task-form-header"><h3></h3></div>
       <label for="task-form-title">Title:</label>
-      <input type="text" id="task-form-title">
+      <div class="task-form-container column">
+        <input type="text" id="task-form-title">
+      </div>
       <label for="task-form-desc">Description:</label>
       <input type="text" id="task-form-desc">
       <label for="task-form-due">Due Date:</label>
       <input type="date" id="task-form-due">
-      <label for="task-form-prio">Important</label>
-      <input type="checkbox" id="task-form-prio">
+      <div class="task-form-container">
+        <label for="task-form-prio">Important</label>
+        <input type="checkbox" id="task-form-prio">
+      </div>
       <div id="task-form-buttons">
         <button id="task-form-cancel">Cancel</button>
       </div>
