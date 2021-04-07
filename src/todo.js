@@ -77,6 +77,13 @@ const todo = (() => {
     }, []);
   };
 
+  const important = () => {
+    return projects.reduce((arr, project) => {
+      arr.push(...project.important());
+      return arr;
+    }, []);
+  };
+
   return {
     store,
     load,
@@ -85,7 +92,8 @@ const todo = (() => {
     at,
     names,
     today,
-    nextWeek
+    nextWeek,
+    important
   };
 })();
 

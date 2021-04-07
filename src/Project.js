@@ -57,6 +57,19 @@ const Project = (name, id) => {
     }, []);
   };
 
+  const important = () => {
+    return tasks.reduce((arr, task, index) => {
+      if(task.info().prio) {
+        arr.push({
+          projectIndex: id,
+          index,
+          ...task.info()
+        });
+      }
+      return arr;
+    }, []);
+  };
+
   return {
     setName,
     getName,
@@ -67,7 +80,8 @@ const Project = (name, id) => {
     remove,
     all,
     today,
-    nextWeek
+    nextWeek,
+    important
   };
 };
 

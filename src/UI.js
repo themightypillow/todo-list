@@ -359,7 +359,7 @@ const UI = (() => {
         todo.nextWeek().forEach(listTask);
         break;
       default:
-        // important
+        todo.important().forEach(listTask);
     }
   };
 
@@ -488,6 +488,13 @@ const UI = (() => {
   (function() {
     document.querySelector("#week").addEventListener("click", e => {
       initMainDisplay(false, "week", "Next 7 Days");
+    });
+  })();
+
+  // display tasks that are marked as important
+  (function() {
+    document.querySelector("#important").addEventListener("click", e => {
+      initMainDisplay(false, "important", "Important");
     });
   })();
 
