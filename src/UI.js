@@ -356,6 +356,7 @@ const UI = (() => {
         todo.today().forEach(listTask);
         break;
       case "week":
+        todo.nextWeek().forEach(listTask);
         break;
       default:
         // important
@@ -480,6 +481,13 @@ const UI = (() => {
   (function() {
     document.querySelector("#today").addEventListener("click", e => {
       initMainDisplay(false, "today", "Today");
+    });
+  })();
+
+  // display tasks due within a week when selected
+  (function() {
+    document.querySelector("#week").addEventListener("click", e => {
+      initMainDisplay(false, "week", "Next 7 Days");
     });
   })();
 

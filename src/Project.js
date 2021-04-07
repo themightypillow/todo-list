@@ -1,5 +1,5 @@
 import Task from "./Task";
-import {isToday} from "date-fns";
+import {isToday, addDays, differenceInCalendarDays} from "date-fns";
 
 const Project = (name, id) => {
   const tasks = [];
@@ -32,13 +32,30 @@ const Project = (name, id) => {
       if(isToday(task.info().due)) {
         arr.push({
           projectIndex: id,
-          index: index,
+          index,
           ...task.info()
         });
       }
       return arr;
     }, []);
-  }
+  };
+
+  const nextWeek = () => {
+    return tasks.reduce((arr, task, index) => {
+      const difference = differenceInCalendarDays(
+        addDays(new Date(), 7), 
+        task.info().due
+      );
+      if(difference >= 0 && difference <= 7) {
+        arr.push({
+          projectIndex: id,
+          index,
+          ...task.info()
+        });
+      }
+      return arr;
+    }, []);
+  };
 
   return {
     setName,
@@ -49,7 +66,8 @@ const Project = (name, id) => {
     add,
     remove,
     all,
-    today
+    today,
+    nextWeek
   };
 };
 

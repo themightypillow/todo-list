@@ -64,9 +64,15 @@ const todo = (() => {
   const names = () => projects.map(project => project.getName());
 
   const today = () => {
-    // return all tasks due today (and past due?)
     return projects.reduce((arr, project) => {
       arr.push(...project.today());
+      return arr;
+    }, []);
+  };
+
+  const nextWeek = () => {
+    return projects.reduce((arr, project) => {
+      arr.push(...project.nextWeek());
       return arr;
     }, []);
   };
@@ -78,7 +84,8 @@ const todo = (() => {
     remove,
     at,
     names,
-    today
+    today,
+    nextWeek
   };
 })();
 
