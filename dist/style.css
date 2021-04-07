@@ -54,6 +54,10 @@ form > div {
   justify-content: space-between;
 }
 
+svg {
+  flex-shrink: 0;
+}
+
 
 .bold {
   font-weight: 700;

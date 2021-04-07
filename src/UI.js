@@ -410,7 +410,7 @@ const UI = (() => {
     container.appendChild(newProject);
     const edit = svg.edit.cloneNode(true);
     edit.classList.add("edit");
-    edit.style.display = "none";
+    edit.style.visibility = "hidden";
     container.appendChild(edit);
 
     edit.addEventListener("click", e => {
@@ -418,10 +418,10 @@ const UI = (() => {
     });
 
     container.addEventListener("mouseover", e => {
-      e.currentTarget.querySelector(".edit").style.display = "block";
+      e.currentTarget.querySelector(".edit").style.visibility = "visible";
     });
     container.addEventListener("mouseout", e => {
-      e.currentTarget.querySelector(".edit").style.display = "none";
+      e.currentTarget.querySelector(".edit").style.visibility = "hidden";
     });
 
     projects.appendChild(container);
